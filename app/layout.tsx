@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="pt-BR"
       suppressHydrationWarning
       className={cn(
         "antialiased",
@@ -28,7 +28,9 @@ export default function RootLayout({
       )}
     >
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          {children} 
+        </ThemeProvider>
       </body>
     </html>
   )
