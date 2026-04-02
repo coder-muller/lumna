@@ -1,0 +1,108 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  
+  "instructions": [
+    "AGENTS.md"
+  ],
+
+  "agent": {
+
+    "cto": {
+      "description": "Agente primário principal. Recebe pedidos, analisa o codebase, cria planos detalhados e orquestra os sub-agentes. NUNCA escreve código diretamente.",
+      "mode": "primary",
+      "temperature": 0.2,
+      "permissions": {
+        "edit": "deny",
+        "write": "deny",
+        "bash": "ask"
+      }
+    },
+
+    "build": {
+      "description": "Agente de build padrão do OpenCode com todas as ferramentas habilitadas. Use quando quiser liberdade total sem fluxo orquestrado.",
+      "mode": "primary",
+      "permissions": {
+        "edit": "allow",
+        "write": "allow",
+        "bash": "allow"
+      }
+    },
+
+    "architect": {
+      "description": "Sub-agente de arquitetura. Analisa o codebase, define estrutura de pastas, contratos de API, interfaces e padrões. APENAS leitura e análise.",
+      "mode": "subagent",
+      "temperature": 0.1,
+      "permissions": {
+        "edit": "deny",
+        "write": "deny",
+        "bash": "deny"
+      }
+    },
+
+    "engineer": {
+      "description": "Sub-agente de implementação. Escreve o código seguindo exatamente o plano do CTO e as especificações do Architect. Faz commits atômicos.",
+      "mode": "subagent",
+      "temperature": 0.0,
+      "permissions": {
+        "edit": "allow",
+        "write": "allow",
+        "bash": "allow"
+      }
+    },
+
+    "qa-engineer": {
+      "description": "Sub-agente de qualidade. Escreve e executa testes unitários, de integração e e2e. Reporta cobertura e falhas. Não altera código de produção.",
+      "mode": "subagent",
+      "temperature": 0.0,
+      "permissions": {
+        "edit": "ask",
+        "write": "allow",
+        "bash": "allow"
+      }
+    },
+
+    "code-reviewer": {
+      "description": "Sub-agente de revisão de código. Analisa qualidade, bugs, performance e boas práticas. SOMENTE LEITURA, nunca altera arquivos.",
+      "mode": "subagent",
+      "temperature": 0.1,
+      "permissions": {
+        "edit": "deny",
+        "write": "deny",
+        "bash": "deny"
+      }
+    },
+
+    "security-auditor": {
+      "description": "Sub-agente de segurança. Audita o código em busca de vulnerabilidades, exposição de dados sensíveis e falhas de autenticação. SOMENTE LEITURA.",
+      "mode": "subagent",
+      "temperature": 0.0,
+      "permissions": {
+        "edit": "deny",
+        "write": "deny",
+        "bash": "deny"
+      }
+    },
+
+    "docs-writer": {
+      "description": "Sub-agente de documentação. Escreve e atualiza README, JSDoc, comentários e changelogs. Não altera código de produção.",
+      "mode": "subagent",
+      "temperature": 0.3,
+      "permissions": {
+        "edit": "ask",
+        "write": "allow",
+        "bash": "deny"
+      }
+    },
+
+    "debugger": {
+      "description": "Sub-agente de debug. Investiga erros, analisa stack traces, executa testes, identifica a causa raiz e propõe correção. Pode editar apenas o arquivo com bug.",
+      "mode": "subagent",
+      "temperature": 0.0,
+      "permissions": {
+        "edit": "ask",
+        "write": "deny",
+        "bash": "allow"
+      }
+    }
+  }
+}

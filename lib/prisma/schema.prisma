@@ -18,9 +18,157 @@ model Users {
   updatedAt     DateTime   @updatedAt
   sessions      Sessions[]
   accounts      Accounts[]
+  billingClients BillingClient[]
+  charges       Charge[]
+  mercadoPagoConnection MercadoPagoConnection?
 
   @@unique([email])
   @@map("users")
+}
+
+enum MercadoPagoConnectionStatus {
+  DISCONNECTED
+  CONNECTED
+  ERROR
+}
+
+enum ChargeStatus {
+  DRAFT
+  OPEN
+  PENDING
+  PAID
+  CANCELLED
+  EXPIRED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  AUTHORIZED
+  IN_PROCESS
+  IN_MEDIATION
+  REJECTED
+  CANCELLED
+  REFUNDED
+  CHARGEDBACK
+}
+
+model MercadoPagoConnection {
+  id                    String                      @id @default(cuid())
+  userId                String                      @unique
+  user                  Users                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status                MercadoPagoConnectionStatus @default(DISCONNECTED)
+  mercadoPagoUserId     String?                     @unique
+  publicKey             String?
+  liveMode              Boolean                     @default(false)
+  encryptedAccessToken  String?
+  encryptedRefreshToken String?
+  accessTokenExpiresAt  DateTime?
+  connectedAt           DateTime?
+  lastSyncedAt          DateTime?
+  lastErrorAt           DateTime?
+  lastErrorMessage      String?
+  createdAt             DateTime                    @default(now())
+  updatedAt             DateTime                    @updatedAt
+  charges               Charge[]
+
+  @@map("mercado_pago_connections")
+}
+
+model BillingClient {
+  id        String   @id @default(cuid())
+  userId    String
+  user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  email     String
+  phone     String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  charges   Charge[]
+
+  @@index([userId])
+  @@index([userId, email])
+  @@unique([userId, email])
+  @@map("billing_clients")
+}
+
+model Charge {
+  id                      String                 @id
+  userId                  String
+  user                    Users                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clientId                String
+  client                  BillingClient          @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  mercadoPagoConnectionId String
+  mercadoPagoConnection   MercadoPagoConnection  @relation(fields: [mercadoPagoConnectionId], references: [id], onDelete: Restrict)
+  title                   String
+  description             String?
+  externalReference       String                 @unique
+  amount                  Decimal                @db.Decimal(12, 2)
+  status                  ChargeStatus           @default(DRAFT)
+  marketplaceFeeAmount    Decimal?               @db.Decimal(12, 2)
+  paidAmount              Decimal?               @db.Decimal(12, 2)
+  gatewayFeeAmount        Decimal?               @db.Decimal(12, 2)
+  netAmount               Decimal?               @db.Decimal(12, 2)
+  paidAt                  DateTime?
+  mercadoPagoPreferenceId String?
+  checkoutUrl             String?
+  sandboxCheckoutUrl      String?
+  expiresAt               DateTime?
+  createdAt               DateTime               @default(now())
+  updatedAt               DateTime               @updatedAt
+  payments                Payment[]
+
+  @@index([userId, status])
+  @@index([clientId])
+  @@index([mercadoPagoConnectionId])
+  @@map("charges")
+}
+
+model Payment {
+  id                  String        @id @default(cuid())
+  chargeId            String
+  charge              Charge        @relation(fields: [chargeId], references: [id], onDelete: Cascade)
+  mercadoPagoPaymentId String       @unique
+  status              PaymentStatus
+  statusDetail        String?
+  transactionAmount   Decimal?      @db.Decimal(12, 2)
+  paidAmount          Decimal?      @db.Decimal(12, 2)
+  marketplaceFeeAmount Decimal?     @db.Decimal(12, 2)
+  gatewayFeeAmount    Decimal?      @db.Decimal(12, 2)
+  netAmount           Decimal?      @db.Decimal(12, 2)
+  currency            String?
+  paidAt              DateTime?
+  payerEmail          String?
+  paymentMethodId     String?
+  paymentTypeId       String?
+  rawData             Json
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  @@index([chargeId])
+  @@map("payments")
+}
+
+model MercadoPagoWebhookEvent {
+  id                    String   @id @default(cuid())
+  topic                 String
+  action                String?
+  mercadoPagoEventId    String?  @unique
+  mercadoPagoResourceId String?
+  mercadoPagoUserId     String?
+  signature             String?
+  requestBody           Json
+  processedAt           DateTime?
+  processingError       String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([topic, mercadoPagoResourceId])
+  @@unique([topic, mercadoPagoResourceId, action])
+  @@map("mercado_pago_webhook_events")
 }
 
 model Sessions {
