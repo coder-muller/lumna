@@ -31,7 +31,11 @@ import {
   ZapIcon,
 } from "lucide-react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
+import { authClient } from "@/lib/auth/client"
+import { toast } from "sonner"
+import { useState } from "react"
+import { Spinner } from "@/components/ui/spinner"
 
 interface NavigationItem {
   name: string
@@ -72,7 +76,28 @@ const navigation: NavigationItem[] = [
 ]
 
 export function AppSidebar({ user }: AppSidebarProps) {
+  const [isSigningOut, setIsSigningOut] = useState(false)
+
   const pathname = usePathname()
+  const router = useRouter()
+
+  async function handleLogout() {
+    setIsSigningOut(true)
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/sign-in")
+        },
+        onError: () => {
+          toast.error("Occoreu em erro!", {
+            description:
+              "Aconteceu um erro ao tentar sair da sua conta. Tente novamente mais tarde.",
+          })
+          setIsSigningOut(false)
+        },
+      },
+    })
+  }
 
   return (
     <Sidebar variant="inset" collapsible="icon">
@@ -173,15 +198,21 @@ export function AppSidebar({ user }: AppSidebarProps) {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link href="/settings">
-                        <BadgeCheckIcon className="text-muted-foreground" />
+                      <Link href="/account">
+                        <BadgeCheckIcon />
                         Conta
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem variant="destructive">
-                      <LogOutIcon />
-                      Sair
+                    <DropdownMenuItem
+                      disabled={isSigningOut}
+                      variant="destructive"
+                      onClick={async () => {
+                        await handleLogout()
+                      }}
+                    >
+                      {isSigningOut ? <Spinner /> : <LogOutIcon />}
+                      {isSigningOut ? "Saindo..." : "Sair"}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
