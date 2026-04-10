@@ -21,32 +21,85 @@ function parseSignatureHeader(headerValue: string | null) {
 
 type WebhookValidationInput = {
   request: Request
-  body: string
   resourceId?: string | null
+}
+
+export type MercadoPagoWebhookValidationResult = {
+  isValid: boolean
+  shouldReject: boolean
+  mode: "signed" | "unsigned" | "development-bypass"
+  reason?: string
 }
 
 export function validateMercadoPagoWebhookSignature({
   request,
-  body: _body,
   resourceId,
-}: WebhookValidationInput) {
+}: WebhookValidationInput): MercadoPagoWebhookValidationResult {
   const secret = env.mercadoPagoWebhookSecret
+  const signatureHeader = request.headers.get("x-signature")
+  const requestId = request.headers.get("x-request-id")
 
-  if (!secret) {
-    return process.env.NODE_ENV === "development"
+  if (!signatureHeader) {
+    return {
+      isValid: true,
+      shouldReject: false,
+      mode: "unsigned",
+      reason: "missing x-signature header",
+    }
   }
 
-  const signature = parseSignatureHeader(request.headers.get("x-signature"))
-  const requestId = request.headers.get("x-request-id")
+  if (!secret) {
+    const isDevelopment = process.env.NODE_ENV === "development"
+
+    return {
+      isValid: isDevelopment,
+      shouldReject: !isDevelopment,
+      mode: isDevelopment ? "development-bypass" : "signed",
+      reason: isDevelopment
+        ? "webhook secret not configured; bypass enabled in development"
+        : "missing webhook secret configuration",
+    }
+  }
+
+  const signature = parseSignatureHeader(signatureHeader)
   const dataId =
     resourceId ?? new URL(request.url).searchParams.get("data.id") ?? undefined
 
-  if (!signature || !requestId || !dataId) {
-    return false
+  if (!signature) {
+    return {
+      isValid: false,
+      shouldReject: true,
+      mode: "signed",
+      reason: "invalid x-signature header format",
+    }
+  }
+
+  if (!requestId) {
+    return {
+      isValid: false,
+      shouldReject: true,
+      mode: "signed",
+      reason: "missing x-request-id header",
+    }
+  }
+
+  if (!dataId) {
+    return {
+      isValid: false,
+      shouldReject: true,
+      mode: "signed",
+      reason: "missing data.id for signature validation",
+    }
   }
 
   const manifest = `id:${dataId};request-id:${requestId};ts:${signature.ts};`
   const digest = createHexHmac(manifest, secret)
+  const isValid = safeCompareHex(digest, signature.v1)
 
-  return safeCompareHex(digest, signature.v1)
+  return {
+    isValid,
+    shouldReject: !isValid,
+    mode: "signed",
+    reason: isValid ? undefined : "signature digest mismatch",
+  }
 }

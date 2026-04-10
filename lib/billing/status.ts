@@ -35,12 +35,22 @@ const chargeStatusLabels: Record<ChargeStatusValue, string> = {
   REFUNDED: "Reembolsada",
 }
 
+export function isChargeStatus(
+  value: string | null | undefined
+): value is ChargeStatusValue {
+  return (
+    value !== null &&
+    value !== undefined &&
+    chargeStatuses.includes(value as ChargeStatusValue)
+  )
+}
+
 export function getChargeStatusLabel(status: string | null | undefined) {
-  if (!status || !(status in chargeStatusLabels)) {
+  if (!isChargeStatus(status)) {
     return "Sem status"
   }
 
-  return chargeStatusLabels[status as ChargeStatusValue]
+  return chargeStatusLabels[status]
 }
 
 export function getChargeStatusBadgeVariant(status: string | null | undefined) {

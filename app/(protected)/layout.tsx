@@ -1,14 +1,5 @@
-import Link from "next/link"
-import { CreditCard, PlugZap } from "lucide-react"
 import { AppSidebar } from "@/components/protected/app-sidebar"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { TooltipProvider } from "@/components/ui/tooltip"
+import { MobileHeader } from "@/components/protected/mobile-header"
 import { requireSession } from "@/lib/auth/functions"
 import { getProtectedLayoutData } from "@/lib/billing/data"
 
@@ -19,42 +10,33 @@ export default async function ProtectedLayout({
 }>) {
   const session = await requireSession()
   const { connection } = await getProtectedLayoutData(session.user.id)
-  const isConnected = connection?.status === "CONNECTED"
+  const isMpConnected = connection?.status === "CONNECTED"
 
   return (
-    <TooltipProvider>
-      <SidebarProvider defaultOpen>
+    <div className="flex min-h-dvh w-full bg-background">
+      {/* Desktop sidebar */}
+      <div className="sticky top-0 hidden h-dvh md:block">
         <AppSidebar
           userName={session.user.name}
           userEmail={session.user.email}
+          userImage={session.user.image || undefined}
+          isMpConnected={isMpConnected}
         />
-        <SidebarInset className="bg-muted/20">
-          <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b bg-background/95 px-4 backdrop-blur">
-            <div className="flex items-center gap-2">
-              <SidebarTrigger className="md:hidden" />
-              <Badge variant={isConnected ? "secondary" : "outline"}>
-                <CreditCard />
-                {isConnected
-                  ? "Mercado Pago conectado"
-                  : "Mercado Pago desconectado"}
-              </Badge>
-            </div>
-            <Button asChild variant={isConnected ? "outline" : "default"}>
-              <Link
-                href={
-                  isConnected
-                    ? "/configuracoes?tab=mercado-pago"
-                    : "/api/mercado-pago/oauth/start"
-                }
-              >
-                <PlugZap />
-                {isConnected ? "Gerenciar conta" : "Conectar Mercado Pago"}
-              </Link>
-            </Button>
-          </header>
-          <div className="flex-1 p-4 sm:p-6">{children}</div>
-        </SidebarInset>
-      </SidebarProvider>
-    </TooltipProvider>
+      </div>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        {/* Mobile header */}
+        <MobileHeader
+          userName={session.user.name}
+          userEmail={session.user.email}
+          userImage={session.user.image || undefined}
+          isMpConnected={isMpConnected}
+        />
+
+        <main className="flex-1 overflow-y-auto">
+          <div className="w-full p-4 md:p-8">{children}</div>
+        </main>
+      </div>
+    </div>
   )
 }

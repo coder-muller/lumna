@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma"
 import { getConnectionAccessToken } from "@/lib/mercado-pago/client"
 import { createCheckoutPreference } from "@/lib/mercado-pago/preferences"
 import { syncChargePayments } from "@/lib/billing/sync"
+import { logMercadoPagoError, logMercadoPagoInfo } from "@/lib/mercado-pago/log"
 
 function parseAmount(value: FormDataEntryValue | null) {
   const rawValue = String(value ?? "")
@@ -74,6 +75,47 @@ function normalizeEmail(value: FormDataEntryValue | null) {
   return String(value ?? "")
     .trim()
     .toLowerCase()
+}
+
+function getCheckoutEnvironment() {
+  return "SANDBOX" as const
+}
+
+async function createPreferenceForCharge(input: {
+  connection: {
+    id: string
+    liveMode: boolean
+    encryptedAccessToken: string | null
+    encryptedRefreshToken: string | null
+    accessTokenExpiresAt: Date | null
+  }
+  charge: {
+    id: string
+    externalReference: string
+    title: string
+    description: string | null
+    amount: { toString(): string }
+    expiresAt: Date | null
+  }
+  payerEmail: string | null
+}) {
+  const checkoutEnvironment = getCheckoutEnvironment()
+  const preference = await createCheckoutPreference({
+    accessToken: await getConnectionAccessToken(input.connection),
+    chargeId: input.charge.id,
+    externalReference: input.charge.externalReference,
+    title: input.charge.title,
+    description: input.charge.description,
+    amount: Number(input.charge.amount.toString()),
+    expiresAt: input.charge.expiresAt,
+    payerEmail: input.payerEmail,
+    checkoutEnvironment,
+  })
+
+  return {
+    preference,
+    checkoutEnvironment,
+  }
 }
 
 export async function createClientAction(formData: FormData) {
@@ -190,18 +232,15 @@ export async function createChargeAction(formData: FormData) {
       amount: amount.toFixed(2),
       status: "DRAFT",
       externalReference: chargeId,
+      checkoutEnvironment: getCheckoutEnvironment(),
       expiresAt,
     },
   })
 
   try {
-    const preference = await createCheckoutPreference({
-      accessToken: await getConnectionAccessToken(connection),
-      externalReference: createdCharge.externalReference,
-      title,
-      description,
-      amount,
-      expiresAt,
+    const { preference, checkoutEnvironment } = await createPreferenceForCharge({
+      connection,
+      charge: createdCharge,
       payerEmail: client.email,
     })
 
@@ -214,9 +253,17 @@ export async function createChargeAction(formData: FormData) {
         mercadoPagoPreferenceId: preference.id,
         checkoutUrl: preference.init_point,
         sandboxCheckoutUrl: preference.sandbox_init_point,
+        checkoutEnvironment,
       },
     })
   } catch (error) {
+    logMercadoPagoError("charge.create.failed", {
+      chargeId: createdCharge.id,
+      preferenceId: createdCharge.mercadoPagoPreferenceId,
+      mercadoPagoUserId: connection.mercadoPagoUserId,
+      message: error instanceof Error ? error.message : "unknown-error",
+    })
+
     await prisma.charge.update({
       where: {
         id: createdCharge.id,
@@ -246,6 +293,79 @@ export async function syncChargeAction(formData: FormData) {
   await syncChargePayments(chargeId, userId)
   revalidatePath("/dashboard")
   revalidatePath("/cobrancas")
+}
+
+export async function refreshOpenChargePreferencesAction() {
+  const userId = await requireUserId()
+  const connection = await prisma.mercadoPagoConnection.findUnique({
+    where: {
+      userId,
+    },
+  })
+
+  if (!connection?.encryptedAccessToken) {
+    throw new Error("Conecte uma conta do Mercado Pago antes de atualizar links")
+  }
+
+  const charges = await prisma.charge.findMany({
+    where: {
+      userId,
+      mercadoPagoConnectionId: connection.id,
+      status: {
+        in: ["OPEN", "PENDING"],
+      },
+      payments: {
+        none: {
+          status: "APPROVED",
+        },
+      },
+    },
+    include: {
+      client: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  })
+
+  let refreshedCount = 0
+
+  for (const charge of charges) {
+    const { preference, checkoutEnvironment } = await createPreferenceForCharge({
+      connection,
+      charge,
+      payerEmail: charge.client.email,
+    })
+
+    await prisma.charge.update({
+      where: {
+        id: charge.id,
+      },
+      data: {
+        mercadoPagoPreferenceId: preference.id,
+        checkoutUrl: preference.init_point,
+        sandboxCheckoutUrl: preference.sandbox_init_point,
+        checkoutEnvironment,
+      },
+    })
+
+    refreshedCount += 1
+  }
+
+  logMercadoPagoInfo("charge.preferences.backfill.completed", {
+    userId,
+    mercadoPagoUserId: connection.mercadoPagoUserId,
+    refreshedCount,
+  })
+
+  revalidatePath("/dashboard")
+  revalidatePath("/cobrancas")
+  revalidatePath("/configuracoes")
+  redirect(
+    `/configuracoes?tab=mercado-pago&success=${
+      refreshedCount > 0 ? "preferences-refreshed" : "preferences-noop"
+    }`
+  )
 }
 
 export async function disconnectMercadoPagoAction() {

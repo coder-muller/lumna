@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server"
 import { getRequestSession } from "@/lib/auth/functions"
-import { encryptMercadoPagoToken, hashValue } from "@/lib/crypto"
+import {
+  decryptMercadoPagoToken,
+  encryptMercadoPagoToken,
+  hashValue,
+} from "@/lib/crypto"
 import { requireAppUrl } from "@/lib/env"
+import { logMercadoPagoError, logMercadoPagoInfo } from "@/lib/mercado-pago/log"
 import { exchangeMercadoPagoCode } from "@/lib/mercado-pago/oauth"
 import { prisma } from "@/lib/prisma"
 
@@ -18,7 +23,8 @@ export async function GET(request: Request) {
   const url = new URL(request.url)
   const code = url.searchParams.get("code")
   const state = url.searchParams.get("state")
-  const identifier = `mercado_pago_oauth_state:${session.user.id}`
+  const stateIdentifier = `mercado_pago_oauth_state:${session.user.id}`
+  const codeVerifierIdentifier = `mercado_pago_oauth_code_verifier:${session.user.id}`
 
   if (!code || !state) {
     return NextResponse.redirect(
@@ -28,7 +34,18 @@ export async function GET(request: Request) {
 
   const verification = await prisma.verifications.findFirst({
     where: {
-      identifier,
+      identifier: stateIdentifier,
+      expiresAt: {
+        gt: new Date(),
+      },
+    },
+    orderBy: {
+      expiresAt: "desc",
+    },
+  })
+  const codeVerifierVerification = await prisma.verifications.findFirst({
+    where: {
+      identifier: codeVerifierIdentifier,
       expiresAt: {
         gt: new Date(),
       },
@@ -38,7 +55,15 @@ export async function GET(request: Request) {
     },
   })
 
-  if (!verification || verification.value !== hashValue(state)) {
+  if (
+    !verification ||
+    !codeVerifierVerification ||
+    verification.value !== hashValue(state)
+  ) {
+    logMercadoPagoError("oauth.callback.invalid_state", {
+      userId: session.user.id,
+    })
+
     return NextResponse.redirect(
       new URL("/configuracoes?tab=mercado-pago&error=state", appUrl)
     )
@@ -46,13 +71,23 @@ export async function GET(request: Request) {
 
   await prisma.verifications.deleteMany({
     where: {
-      identifier,
+      identifier: {
+        in: [stateIdentifier, codeVerifierIdentifier],
+      },
     },
   })
 
   try {
-    const token = await exchangeMercadoPagoCode(code)
+    const codeVerifier = decryptMercadoPagoToken(codeVerifierVerification.value)
+    const token = await exchangeMercadoPagoCode(code, codeVerifier)
     const nextMercadoPagoUserId = String(token.user_id)
+
+    logMercadoPagoInfo("oauth.callback.exchange_success", {
+      userId: session.user.id,
+      mercadoPagoUserId: nextMercadoPagoUserId,
+      liveMode: Boolean(token.live_mode),
+    })
+
     const existingConnection = await prisma.mercadoPagoConnection.findUnique({
       where: {
         userId: session.user.id,
@@ -151,6 +186,11 @@ export async function GET(request: Request) {
             ? error.message
             : "Falha ao conectar com o Mercado Pago",
       },
+    })
+
+    logMercadoPagoError("oauth.callback.exchange_failed", {
+      userId: session.user.id,
+      message: error instanceof Error ? error.message : "unknown-error",
     })
 
     return NextResponse.redirect(

@@ -55,6 +55,17 @@ enum PaymentStatus {
   CHARGEDBACK
 }
 
+enum CheckoutEnvironment {
+  LIVE
+  SANDBOX
+}
+
+enum CheckoutReturnStatus {
+  SUCCESS
+  PENDING
+  FAILURE
+}
+
 model MercadoPagoConnection {
   id                    String                      @id @default(cuid())
   userId                String                      @unique
@@ -116,6 +127,10 @@ model Charge {
   mercadoPagoPreferenceId String?
   checkoutUrl             String?
   sandboxCheckoutUrl      String?
+  checkoutEnvironment     CheckoutEnvironment    @default(SANDBOX)
+  lastCheckoutReturnStatus CheckoutReturnStatus?
+  lastCheckoutReturnPayload Json?
+  lastCheckoutReturnAt    DateTime?
   expiresAt               DateTime?
   createdAt               DateTime               @default(now())
   updatedAt               DateTime               @updatedAt

@@ -56,6 +56,10 @@ export function hashValue(value: string) {
   return createHash("sha256").update(value).digest("hex")
 }
 
+export function createSha256Base64Url(value: string) {
+  return createHash("sha256").update(value).digest("base64url")
+}
+
 export function createHexHmac(value: string, secret: string) {
   return createHmac("sha256", secret).update(value).digest("hex")
 }

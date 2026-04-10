@@ -67,6 +67,10 @@ export function requireAppUrl() {
   return env.appUrl ?? normalizeUrl(getRequiredEnv("appUrl"))
 }
 
+export function requireMercadoPagoAppUrl() {
+  return normalizeUrl(getRequiredEnv("appUrl"))
+}
+
 export function requireMercadoPagoOAuthEnv() {
   return {
     clientId: getRequiredEnv("mercadoPagoClientId"),

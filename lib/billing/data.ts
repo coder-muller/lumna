@@ -1,10 +1,10 @@
 import { prisma } from "@/lib/prisma"
 import type { Prisma } from "@/lib/generated/prisma/client"
-import { ChargeStatus } from "@/lib/generated/prisma/enums"
+import type { ChargeStatusValue } from "@/lib/billing/status"
 
 type ChargeFilters = {
   query?: string
-  status?: string
+  status?: ChargeStatusValue | "ALL"
 }
 
 type ClientFilters = {
@@ -73,7 +73,7 @@ export async function getChargesData(userId: string, filters: ChargeFilters) {
   const where: Prisma.ChargeWhereInput = {
     userId,
     ...(filters.status && filters.status !== "ALL"
-      ? { status: filters.status as ChargeStatus }
+      ? { status: filters.status }
       : {}),
     ...(filters.query
       ? {
@@ -168,15 +168,31 @@ export async function getNewChargeData(userId: string) {
 }
 
 export async function getSettingsData(userId: string) {
-  const connection = await getMercadoPagoConnection(userId)
-  const user = await prisma.users.findUnique({
-    where: {
-      id: userId,
-    },
-  })
+  const [connection, user, refreshableChargesCount] = await Promise.all([
+    getMercadoPagoConnection(userId),
+    prisma.users.findUnique({
+      where: {
+        id: userId,
+      },
+    }),
+    prisma.charge.count({
+      where: {
+        userId,
+        status: {
+          in: ["OPEN", "PENDING"],
+        },
+        payments: {
+          none: {
+            status: "APPROVED",
+          },
+        },
+      },
+    }),
+  ])
 
   return {
     connection,
+    refreshableChargesCount,
     user,
   }
 }

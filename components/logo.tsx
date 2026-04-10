@@ -6,7 +6,7 @@ interface LogoProps {
   showText?: boolean
 }
 
-export const Logo = ({ size = "md", showText = true }: LogoProps) => {
+export function Logo({ size = "md", showText = true }: LogoProps) {
   const iconSizes = { sm: 14, md: 18, lg: 22 }
   const textSizes = { sm: "text-sm", md: "text-base", lg: "text-lg" }
   const containerSizes = { sm: "p-1", md: "p-1.5", lg: "p-2" }
@@ -15,11 +15,11 @@ export const Logo = ({ size = "md", showText = true }: LogoProps) => {
     <div className="flex items-center gap-2">
       <div
         className={cn(
-          "flex items-center justify-center rounded-lg bg-primary/10",
+          "flex items-center justify-center rounded-lg bg-lumna-light",
           containerSizes[size]
         )}
       >
-        <Zap size={iconSizes[size]} className="fill-primary text-primary" />
+        <Zap size={iconSizes[size]} className="fill-lumna text-lumna" />
       </div>
       {showText && (
         <span

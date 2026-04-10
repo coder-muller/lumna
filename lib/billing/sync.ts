@@ -4,11 +4,16 @@ import {
   mapMercadoPagoPaymentStatusToPaymentStatus,
 } from "@/lib/billing/status"
 import { getConnectionAccessToken } from "@/lib/mercado-pago/client"
+import { logMercadoPagoError, logMercadoPagoInfo, logMercadoPagoWarn } from "@/lib/mercado-pago/log"
 import {
   getMercadoPagoPaymentById,
   searchMercadoPagoPaymentsByExternalReference,
   type MercadoPagoPayment,
 } from "@/lib/mercado-pago/payments"
+
+type ChargeWithConnection = Awaited<
+  ReturnType<typeof getChargeWithConnectionById>
+>
 
 function toDecimal(value: number | null | undefined) {
   if (value === null || value === undefined || !Number.isFinite(value)) {
@@ -81,6 +86,40 @@ function pickChargeSnapshotPayment(payments: MercadoPagoPayment[]) {
   })[0]
 }
 
+function buildChargeLogContext(charge: NonNullable<ChargeWithConnection>) {
+  return {
+    chargeId: charge.id,
+    preferenceId: charge.mercadoPagoPreferenceId,
+    mercadoPagoUserId: charge.mercadoPagoConnection.mercadoPagoUserId,
+  }
+}
+
+async function getChargeWithConnectionById(chargeId: string) {
+  return prisma.charge.findUnique({
+    where: {
+      id: chargeId,
+    },
+    include: {
+      mercadoPagoConnection: true,
+    },
+  })
+}
+
+async function getChargeForResponse(chargeId: string) {
+  return prisma.charge.findUnique({
+    where: {
+      id: chargeId,
+    },
+    include: {
+      client: true,
+      payments: {
+        orderBy: [{ paidAt: "desc" }, { createdAt: "desc" }],
+        take: 1,
+      },
+    },
+  })
+}
+
 async function updateChargeSnapshot(
   connection: {
     id: string
@@ -147,6 +186,11 @@ export async function upsertMercadoPagoPayment(
   const chargeId = payment.external_reference
 
   if (!chargeId) {
+    logMercadoPagoWarn("payment.upsert.missing_external_reference", {
+      paymentId: String(payment.id),
+      mercadoPagoUserId: connection.userId,
+    })
+
     return null
   }
 
@@ -159,6 +203,11 @@ export async function upsertMercadoPagoPayment(
   })
 
   if (!charge) {
+    logMercadoPagoWarn("payment.upsert.charge_not_found", {
+      chargeId,
+      paymentId: String(payment.id),
+    })
+
     return null
   }
 
@@ -202,6 +251,25 @@ export async function upsertMercadoPagoPayment(
   return charge.id
 }
 
+async function syncChargePaymentsInternal(
+  charge: NonNullable<ChargeWithConnection>,
+  payments: MercadoPagoPayment[]
+) {
+  for (const payment of payments) {
+    await upsertMercadoPagoPayment(charge.mercadoPagoConnection, payment)
+  }
+
+  const snapshotPayment = pickChargeSnapshotPayment(payments)
+
+  if (snapshotPayment) {
+    await updateChargeSnapshot(charge.mercadoPagoConnection, snapshotPayment)
+  }
+
+  await markConnectionSynced(charge.mercadoPagoConnection.id)
+
+  return getChargeForResponse(charge.id)
+}
+
 export async function syncChargePayments(chargeId: string, userId: string) {
   const charge = await prisma.charge.findFirst({
     where: {
@@ -217,6 +285,8 @@ export async function syncChargePayments(chargeId: string, userId: string) {
     throw new Error("Cobrança não encontrada")
   }
 
+  logMercadoPagoInfo("charge.sync.search.start", buildChargeLogContext(charge))
+
   const accessToken = await getConnectionAccessToken(
     charge.mercadoPagoConnection
   )
@@ -225,30 +295,90 @@ export async function syncChargePayments(chargeId: string, userId: string) {
     charge.externalReference
   )
 
-  for (const payment of payments) {
-    await upsertMercadoPagoPayment(charge.mercadoPagoConnection, payment)
-  }
-
-  const snapshotPayment = pickChargeSnapshotPayment(payments)
-
-  if (snapshotPayment) {
-    await updateChargeSnapshot(charge.mercadoPagoConnection, snapshotPayment)
-  }
-
-  await markConnectionSynced(charge.mercadoPagoConnection.id)
-
-  return prisma.charge.findUnique({
-    where: {
-      id: charge.id,
-    },
-    include: {
-      client: true,
-      payments: {
-        orderBy: [{ paidAt: "desc" }, { createdAt: "desc" }],
-        take: 1,
-      },
-    },
+  logMercadoPagoInfo("charge.sync.search.result", {
+    ...buildChargeLogContext(charge),
+    paymentsFound: payments.length,
   })
+
+  return syncChargePaymentsInternal(charge, payments)
+}
+
+export async function syncChargePaymentsById(chargeId: string) {
+  const charge = await getChargeWithConnectionById(chargeId)
+
+  if (!charge) {
+    throw new Error("Cobrança não encontrada")
+  }
+
+  logMercadoPagoInfo("charge.sync.public.start", buildChargeLogContext(charge))
+
+  const accessToken = await getConnectionAccessToken(
+    charge.mercadoPagoConnection
+  )
+  const payments = await searchMercadoPagoPaymentsByExternalReference(
+    accessToken,
+    charge.externalReference
+  )
+
+  logMercadoPagoInfo("charge.sync.public.result", {
+    ...buildChargeLogContext(charge),
+    paymentsFound: payments.length,
+  })
+
+  return syncChargePaymentsInternal(charge, payments)
+}
+
+export async function syncChargePaymentById(input: {
+  chargeId: string
+  paymentId: string
+}) {
+  const charge = await getChargeWithConnectionById(input.chargeId)
+
+  if (!charge) {
+    throw new Error("Cobrança não encontrada")
+  }
+
+  logMercadoPagoInfo("charge.sync.payment_id.start", {
+    ...buildChargeLogContext(charge),
+    paymentId: input.paymentId,
+  })
+
+  const accessToken = await getConnectionAccessToken(
+    charge.mercadoPagoConnection
+  )
+  const payment = await getMercadoPagoPaymentById(accessToken, input.paymentId)
+
+  if (
+    payment.external_reference &&
+    payment.external_reference !== charge.externalReference
+  ) {
+    logMercadoPagoError("charge.sync.payment_id.external_reference_mismatch", {
+      ...buildChargeLogContext(charge),
+      paymentId: input.paymentId,
+      paymentExternalReference: payment.external_reference,
+    })
+
+    throw new Error(
+      "O pagamento retornado pelo Mercado Pago não pertence a esta cobrança."
+    )
+  }
+
+  const payments = payment.external_reference
+    ? await searchMercadoPagoPaymentsByExternalReference(
+        accessToken,
+        payment.external_reference
+      )
+    : [payment]
+
+  logMercadoPagoInfo("charge.sync.payment_id.result", {
+    ...buildChargeLogContext(charge),
+    paymentId: input.paymentId,
+    paymentsFound: payments.length,
+    status: payment.status,
+    statusDetail: payment.status_detail,
+  })
+
+  return syncChargePaymentsInternal(charge, payments)
 }
 
 export async function syncPaymentFromWebhook(input: {
@@ -256,6 +386,9 @@ export async function syncPaymentFromWebhook(input: {
   paymentId: string
 }) {
   if (!input.mercadoPagoUserId) {
+    logMercadoPagoWarn("webhook.sync.missing_user_id", {
+      paymentId: input.paymentId,
+    })
     return null
   }
 
@@ -266,11 +399,23 @@ export async function syncPaymentFromWebhook(input: {
   })
 
   if (!connection) {
+    logMercadoPagoWarn("webhook.sync.connection_not_found", {
+      mercadoPagoUserId: input.mercadoPagoUserId,
+      paymentId: input.paymentId,
+    })
     return null
   }
 
   const accessToken = await getConnectionAccessToken(connection)
   const payment = await getMercadoPagoPaymentById(accessToken, input.paymentId)
+
+  logMercadoPagoInfo("webhook.sync.payment_fetched", {
+    paymentId: input.paymentId,
+    mercadoPagoUserId: input.mercadoPagoUserId,
+    externalReference: payment.external_reference,
+    status: payment.status,
+    statusDetail: payment.status_detail,
+  })
 
   const payments = payment.external_reference
     ? await searchMercadoPagoPaymentsByExternalReference(

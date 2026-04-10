@@ -1,3 +1,4 @@
+import { createSha256Base64Url } from "@/lib/crypto"
 import { mercadoPagoRequest } from "@/lib/mercado-pago/client"
 import { getMercadoPagoOAuthConfig } from "@/lib/mercado-pago/config"
 
@@ -10,7 +11,10 @@ type MercadoPagoOAuthTokenResponse = {
   live_mode?: boolean
 }
 
-export function buildMercadoPagoAuthorizationUrl(state: string) {
+export function buildMercadoPagoAuthorizationUrl(
+  state: string,
+  codeChallenge: string
+) {
   const oauth = getMercadoPagoOAuthConfig()
   const url = new URL(oauth.authorizationUrl)
 
@@ -19,11 +23,20 @@ export function buildMercadoPagoAuthorizationUrl(state: string) {
   url.searchParams.set("platform_id", "mp")
   url.searchParams.set("state", state)
   url.searchParams.set("redirect_uri", oauth.redirectUri)
+  url.searchParams.set("code_challenge", codeChallenge)
+  url.searchParams.set("code_challenge_method", "S256")
 
   return url.toString()
 }
 
-export async function exchangeMercadoPagoCode(code: string) {
+export function createMercadoPagoCodeChallenge(codeVerifier: string) {
+  return createSha256Base64Url(codeVerifier)
+}
+
+export async function exchangeMercadoPagoCode(
+  code: string,
+  codeVerifier: string
+) {
   const oauth = getMercadoPagoOAuthConfig()
 
   return mercadoPagoRequest<MercadoPagoOAuthTokenResponse>("/oauth/token", {
@@ -34,6 +47,7 @@ export async function exchangeMercadoPagoCode(code: string) {
       code,
       grant_type: "authorization_code",
       redirect_uri: oauth.redirectUri,
+      code_verifier: codeVerifier,
     },
   })
 }
