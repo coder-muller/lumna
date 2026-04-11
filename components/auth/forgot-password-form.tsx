@@ -14,64 +14,67 @@ import Link from "next/link"
 import { toast } from "sonner"
 
 const forgotPasswordFormSchema = z.object({
-    email: z.email("Email inválido").trim(),
+  email: z.email("Email inválido").trim(),
 })
 
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordFormSchema>
 
 export default function ForgotPasswordForm() {
-    const router = useRouter()
+  const router = useRouter()
 
-    const form = useForm<ForgotPasswordFormData>({
-        resolver: zodResolver(forgotPasswordFormSchema),
-        defaultValues: {
-            email: "",
-        },
+  const form = useForm<ForgotPasswordFormData>({
+    resolver: zodResolver(forgotPasswordFormSchema),
+    defaultValues: {
+      email: "",
+    },
+  })
+
+  async function onSubmit() {
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+    toast.success("Link de recuperação enviado!", {
+      description: "Verifique seu email para redefinir sua senha.",
     })
+    router.push("/reset-password")
+    form.reset()
+  }
 
-    async function onSubmit() {
-        await new Promise((resolve) => setTimeout(resolve, 2000))
-        toast.success("Link de recuperação enviado!", {
-            description: "Verifique seu email para redefinir sua senha."
-        })
-        router.push("/reset-password")
-        form.reset()
-    }
+  const isSubmitting = form.formState.isSubmitting
 
-    const isSubmitting = form.formState.isSubmitting
-
-    return (
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-            <Controller
-                name="email"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor={field.name}>Email</FieldLabel>
-                        <FieldContent>
-                            <Input
-                                {...field}
-                                aria-invalid={fieldState.invalid}
-                                placeholder="joao@example.com"
-                                type="email"
-                                disabled={isSubmitting}
-                            />
-                        </FieldContent>
-                        {fieldState.error && (
-                            <FieldError>{fieldState.error.message}</FieldError>
-                        )}
-                    </Field>
-                )}
-            />
-            <Button type="submit" disabled={isSubmitting} className="w-full mt-2">
-                {isSubmitting ? <Spinner /> : "Enviar link de recuperação"}
-            </Button>
-            <p className="text-center text-muted-foreground text-sm">
-                Lembrou da sua senha?{" "}
-                <Link href="/sign-in" className="text-primary font-medium hover:underline">
-                    Entrar
-                </Link>
-            </p>
-        </form>
-    )
+  return (
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+      <Controller
+        name="email"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+            <FieldContent>
+              <Input
+                {...field}
+                aria-invalid={fieldState.invalid}
+                placeholder="joao@example.com"
+                type="email"
+                disabled={isSubmitting}
+              />
+            </FieldContent>
+            {fieldState.error && (
+              <FieldError>{fieldState.error.message}</FieldError>
+            )}
+          </Field>
+        )}
+      />
+      <Button type="submit" disabled={isSubmitting} className="mt-2 w-full">
+        {isSubmitting ? <Spinner /> : "Enviar link de recuperação"}
+      </Button>
+      <p className="text-center text-sm text-muted-foreground">
+        Lembrou da sua senha?{" "}
+        <Link
+          href="/sign-in"
+          className="font-medium text-primary hover:underline"
+        >
+          Entrar
+        </Link>
+      </p>
+    </form>
+  )
 }

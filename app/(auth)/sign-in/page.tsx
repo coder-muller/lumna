@@ -15,7 +15,7 @@ export default async function SignInPage() {
 
       <div className="w-full max-w-sm animate-in space-y-8">
         <div className="flex flex-col space-y-1">
-          <h1 className="text-2xl font-bold tracking-wide">Olá novamente!</h1>
+          <h1 className="text-2xl font-bold tracking-wide">Bem-vindo de volta!</h1>
           <p className="text-base text-muted-foreground">
             Entre na sua conta para continuar
           </p>

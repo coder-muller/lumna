@@ -112,12 +112,15 @@ export default function SignUpForm() {
           </Field>
         )}
       />
-      <Button type="submit" disabled={isSubmitting} className="w-full mt-2">
+      <Button type="submit" disabled={isSubmitting} className="mt-2 w-full">
         {isSubmitting ? <Spinner /> : "Criar conta"}
       </Button>
-      <p className="text-center text-muted-foreground text-sm">
+      <p className="text-center text-sm text-muted-foreground">
         Já tem uma conta?{" "}
-        <Link href="/sign-in" className="text-primary font-medium hover:underline">
+        <Link
+          href="/sign-in"
+          className="font-medium text-primary hover:underline"
+        >
           Entrar
         </Link>
       </p>
