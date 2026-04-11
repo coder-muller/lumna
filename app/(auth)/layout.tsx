@@ -11,7 +11,7 @@ export default function AuthLayout({
 }) {
   return (
     <div className="relative flex min-h-screen w-full items-center justify-center">
-      <header className="absolute top-0 right-0 left-0 w-full p-4 flex items-center justify-between">
+      <header className="absolute top-0 right-0 left-0 flex w-full items-center justify-between p-4">
         <Button asChild variant="ghost" size="icon">
           <Link href="/">
             <ArrowLeftIcon />

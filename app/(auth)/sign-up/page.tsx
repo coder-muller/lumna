@@ -14,7 +14,9 @@ export default async function SignUpPage() {
       <DecorIcon position="bottom-right" />
       <div className="w-full max-w-sm animate-in space-y-8">
         <div className="flex flex-col space-y-1">
-          <h1 className="text-2xl font-bold tracking-wide">Bem vindo ao Lumna!</h1>
+          <h1 className="text-2xl font-bold tracking-wide">
+            Bem vindo ao Lumna!
+          </h1>
           <p className="text-base text-muted-foreground">
             Crie sua conta para continuar
           </p>

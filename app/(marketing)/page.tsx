@@ -1,15 +1,7 @@
 import Link from "next/link"
-import {
-  ArrowRight,
-  Zap,
-  Shield,
-  Receipt,
-  Check,
-  CreditCard,
-} from "lucide-react"
+import { ArrowRight, Zap, Shield, Receipt, Check } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { LogoIcon } from "@/components/ui/logo-icon"
 import { DecorIcon } from "@/components/ui/decor-icon"
@@ -53,7 +45,7 @@ export default function Page() {
 
         {/* Hero */}
         <section className="relative flex flex-col items-center px-6 pt-32 pb-24 text-center md:px-12 md:pt-48 md:pb-40">
-          <h1 className="md:mt-22 max-w-3xl text-4xl font-bold tracking-tight text-balance sm:text-5xl md:text-6xl md:leading-[1.1]">
+          <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-balance sm:text-5xl md:mt-22 md:text-6xl md:leading-[1.1]">
             Cobranças profissionais para quem vive do próprio trabalho
           </h1>
           <p className="mt-6 max-w-xl text-base text-pretty text-muted-foreground md:text-lg">
