@@ -9,7 +9,6 @@ import { LogoIcon } from "@/components/ui/logo-icon"
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarHeader,
   SidebarMenu,
@@ -18,7 +17,6 @@ import {
 } from "@/components/ui/sidebar"
 
 import { getNavGroups } from "./app-shared"
-import { LatestChange } from "./latest-change"
 import { NavGroup } from "./nav-group"
 
 export function AppSidebar() {
@@ -64,9 +62,11 @@ export function AppSidebar() {
           <NavGroup key={`sidebar-group-${index}`} {...group} />
         ))}
       </SidebarContent>
+      {/*
       <SidebarFooter>
         <LatestChange />
       </SidebarFooter>
+      */}
     </Sidebar>
   )
 }
