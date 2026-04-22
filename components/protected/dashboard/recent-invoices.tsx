@@ -25,8 +25,8 @@ interface Invoice {
 const recentInvoices: Invoice[] = [
   {
     id: "1",
-    client: "Empresa ABC",
-    email: "contato@abc.com",
+    client: "Fintech Solutions",
+    email: "contato@fintechsolutions.com",
     desc: "Consultoria Mensal",
     amount: "R$ 3.520,75",
     due: "20/04/2026",
