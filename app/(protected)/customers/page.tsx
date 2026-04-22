@@ -1,10 +1,32 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
-import { Skeleton } from "@/components/ui/skeleton";
-import { AlertTriangleIcon, ChevronLeftIcon, ChevronRightIcon, MoreHorizontalIcon, PlusIcon, RefreshCwIcon, SearchIcon, UserPlusIcon, PencilIcon, TrashIcon, InfoIcon } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import Link from "next/link";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group"
+import { Skeleton } from "@/components/ui/skeleton"
+import {
+  AlertTriangleIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  MoreHorizontalIcon,
+  PlusIcon,
+  RefreshCwIcon,
+  SearchIcon,
+  UserPlusIcon,
+  PencilIcon,
+  TrashIcon,
+  InfoIcon,
+} from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuSeparator,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import Link from "next/link"
 interface Client {
   id: string
   name: string
@@ -14,7 +36,6 @@ interface Client {
 }
 
 export default function CustomersPage() {
-
   const clients: Client[] = [
     {
       id: "0",
@@ -133,7 +154,7 @@ export default function CustomersPage() {
         </p>
       </div>
 
-      <section className="w-full flex items-center justify-between gap-2">
+      <section className="flex w-full items-center justify-between gap-2">
         <InputGroup className="max-w-sm">
           <InputGroupAddon>
             <SearchIcon />
@@ -148,18 +169,21 @@ export default function CustomersPage() {
       </section>
 
       {/* Loading state with skeletons */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="bg-card rounded-xl border border-border p-5 space-y-4">
+          <div
+            key={i}
+            className="space-y-4 rounded-xl border border-border bg-card p-5"
+          >
             <div className="flex items-start justify-between">
-              <Skeleton className="w-10 h-10 rounded-full" />
-              <Skeleton className="w-4 h-4 rounded" />
+              <Skeleton className="h-10 w-10 rounded-full" />
+              <Skeleton className="h-4 w-4 rounded" />
             </div>
             <div className="space-y-2">
               <Skeleton className="h-4 w-32 rounded" />
               <Skeleton className="h-3 w-40 rounded" />
             </div>
-            <div className="border-t border-border pt-4 space-y-2">
+            <div className="space-y-2 border-t border-border pt-4">
               <Skeleton className="h-3 w-48 rounded" />
               <Skeleton className="h-3 w-28 rounded" />
             </div>
@@ -168,13 +192,16 @@ export default function CustomersPage() {
       </div>
 
       {/* Error state */}
-      <div className="bg-card rounded-xl border border-destructive/20 p-16 text-center">
-        <div className="w-14 h-14 rounded-full bg-destructive/10 mx-auto flex items-center justify-center">
+      <div className="rounded-xl border border-destructive/20 bg-card p-16 text-center">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
           <AlertTriangleIcon size={24} className="text-destructive" />
         </div>
-        <p className="font-medium text-foreground mt-4">Erro ao carregar clientes</p>
-        <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
-          Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.
+        <p className="mt-4 font-medium text-foreground">
+          Erro ao carregar clientes
+        </p>
+        <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
+          Não foi possível conectar ao servidor. Verifique sua conexão e tente
+          novamente.
         </p>
         <Button variant="outline" className="mt-5">
           <RefreshCwIcon size={14} /> Tentar novamente
@@ -182,12 +209,12 @@ export default function CustomersPage() {
       </div>
 
       {/* Empty state — no clients added yet */}
-      <div className="bg-card rounded-xl border border-border p-16 text-center">
-        <div className="w-14 h-14 rounded-full mx-auto flex items-center justify-center">
+      <div className="rounded-xl border border-border bg-card p-16 text-center">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full">
           <UserPlusIcon size={24} />
         </div>
-        <p className="font-medium text-foreground mt-4">Nenhum cliente ainda</p>
-        <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
+        <p className="mt-4 font-medium text-foreground">Nenhum cliente ainda</p>
+        <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
           Adicione seu primeiro cliente para começar a enviar cobranças.
         </p>
         <Button className="mt-5">
@@ -196,13 +223,17 @@ export default function CustomersPage() {
       </div>
 
       {/* Empty state — search with no results */}
-      <div className="bg-card rounded-xl border border-border p-16 text-center">
-        <div className="w-14 h-14 rounded-full bg-muted mx-auto flex items-center justify-center">
+      <div className="rounded-xl border border-border bg-card p-16 text-center">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-muted">
           <SearchIcon size={24} className="text-muted-foreground" />
         </div>
-        <p className="font-medium text-foreground mt-4">Nenhum resultado encontrado</p>
-        <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
-          Nenhum cliente corresponde a &quot;<span className="font-medium text-foreground">search value</span>&quot;. Tente outro termo.
+        <p className="mt-4 font-medium text-foreground">
+          Nenhum resultado encontrado
+        </p>
+        <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
+          Nenhum cliente corresponde a &quot;
+          <span className="font-medium text-foreground">search value</span>
+          &quot;. Tente outro termo.
         </p>
         <Button variant="outline" className="mt-5">
           Limpar busca
@@ -210,11 +241,11 @@ export default function CustomersPage() {
       </div>
 
       {/* Client Cards Grid with pagination */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {clients.splice(0, 6).map((client) => (
           <div
             key={client.id}
-            className="bg-card rounded-xl border border-border p-5 hover:shadow-md transition-all duration-200 cursor-pointer group"
+            className="group cursor-pointer rounded-xl border border-border bg-card p-5 transition-all duration-200 hover:shadow-md"
           >
             <div className="flex items-start justify-between">
               <Avatar>
@@ -224,7 +255,11 @@ export default function CustomersPage() {
               </Avatar>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="text-muted-foreground hover:text-foreground md:opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground transition-opacity group-hover:opacity-100 hover:text-foreground md:opacity-0"
+                  >
                     <MoreHorizontalIcon size={16} />
                   </Button>
                 </DropdownMenuTrigger>
@@ -245,15 +280,20 @@ export default function CustomersPage() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <p className="font-semibold text-sm text-foreground mt-3">{client.name}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">{client.email}</p>
-            <div className="border-t border-border mt-4 pt-4">
+            <p className="mt-3 text-sm font-semibold text-foreground">
+              {client.name}
+            </p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {client.email}
+            </p>
+            <div className="mt-4 border-t border-border pt-4">
               <p className="text-xs text-muted-foreground">
-                {client.totalInvoices} cobranças · {formatCurrency(client.totalRevenue)} recebido
+                {client.totalInvoices} cobranças ·{" "}
+                {formatCurrency(client.totalRevenue)} recebido
               </p>
               <Link
                 href="/invoices/new"
-                className="text-xs text-lumna hover:underline mt-2 inline-block font-medium"
+                className="text-lumna mt-2 inline-block text-xs font-medium hover:underline"
               >
                 Nova cobrança -&gt;
               </Link>
@@ -262,19 +302,13 @@ export default function CustomersPage() {
         ))}
       </div>
 
-      <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-border">
+      <div className="mt-6 flex flex-col-reverse items-center justify-between gap-4 border-t border-border pt-4 sm:flex-row">
         <p className="text-sm text-muted-foreground">
-          Mostrando{" "}
-          <span className="font-medium text-foreground">
-            1-6
-          </span>{" "}
-          de <span className="font-medium text-foreground">74</span> clientes
+          Mostrando <span className="font-medium text-foreground">1-6</span> de{" "}
+          <span className="font-medium text-foreground">74</span> clientes
         </p>
         <div className="flex items-center gap-1">
-          <Button
-            variant="outline"
-            size="sm"
-          >
+          <Button variant="outline" size="sm">
             <ChevronLeftIcon /> Anterior
           </Button>
           {Array.from({ length: 3 }).map((_, i) => (
@@ -287,11 +321,7 @@ export default function CustomersPage() {
               {i + 1}
             </Button>
           ))}
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-8 px-3"
-          >
+          <Button variant="outline" size="sm" className="h-8 px-3">
             Próxima <ChevronRightIcon />
           </Button>
         </div>

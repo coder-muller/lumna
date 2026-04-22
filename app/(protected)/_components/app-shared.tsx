@@ -1,7 +1,6 @@
 import type { ReactNode } from "react"
 import {
   BarChart3Icon,
-  CircleUserRoundIcon,
   FileTextIcon,
   LayoutGridIcon,
   ReceiptTextIcon,
@@ -49,21 +48,6 @@ const baseNavGroups: SidebarNavGroup[] = [
         title: "Clientes",
         path: "/customers",
         icon: <UsersIcon />,
-      },
-    ],
-  },
-  {
-    label: "Configurações",
-    items: [
-      {
-        title: "Conta",
-        path: "/account",
-        icon: <CircleUserRoundIcon />,
-        subItems: [
-          { title: "Segurança", path: "/account#seguranca" },
-          { title: "Stripe Connect", path: "/account#stripe-connect" },
-          { title: "Empresa", path: "/account#empresa" },
-        ],
       },
     ],
   },

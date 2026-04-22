@@ -52,9 +52,11 @@ export function NavUser() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <UserIcon />
-            Perfil
+          <DropdownMenuItem asChild>
+            <Link href="/account">
+              <UserIcon />
+              Perfil
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <ShieldIcon />
