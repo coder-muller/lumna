@@ -73,15 +73,18 @@ const features = [
     className: "md:col-span-2 md:row-span-1",
     visual: (
       <div className="absolute top-0 right-0 flex h-full w-1/2 items-center justify-end bg-linear-to-l from-background to-transparent pr-8">
-        <div className="flex flex-col items-end gap-2">
+        <div className="flex flex-col items-end gap-1.5">
           <div className="font-mono text-2xl font-medium text-foreground">
-            R$ 1.250,00
+            R$ 100,00
           </div>
-          <div className="font-mono text-xs text-muted-foreground">
-            - R$ 12,38 (0,99%)
+          <div className="font-mono text-[10px] text-muted-foreground">
+            - R$ 0,99 (Lumna)
+          </div>
+          <div className="font-mono text-[10px] text-muted-foreground">
+            - R$ 4,49 (Stripe)
           </div>
           <div className="my-1 h-px w-full bg-border/50" />
-          <div className="font-mono text-sm text-emerald-500">R$ 1.237,62</div>
+          <div className="font-mono text-sm text-emerald-500">R$ 94,52</div>
         </div>
       </div>
     ),

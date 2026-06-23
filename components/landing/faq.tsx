@@ -19,7 +19,12 @@ const faqs = [
   {
     question: "Existe taxa mensal ou limite de cobranças?",
     answer:
-      "Não há taxa mensal, taxa de adesão ou limite de cobranças. Você paga apenas 0,99% sobre o valor de cada transação concluída com sucesso.",
+      "Não há taxa mensal, taxa de adesão ou limite de cobranças. O Lumna cobra uma taxa de plataforma de 0,99% por transação. Além disso, aplicam-se as taxas de processamento da Stripe (3,99% + R$ 0,50 para cartões nacionais).",
+  },
+  {
+    question: "Como funcionam as taxas para cartões internacionais?",
+    answer:
+      "Para pagamentos com cartão internacional, a Stripe cobra um adicional de 2% sobre a transação, além da taxa padrão.",
   },
   {
     question: "Como funciona o deferred onboarding?",

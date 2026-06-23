@@ -82,6 +82,12 @@ export function Hero() {
                 <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </span>
             </Link>
+            <div className="flex items-center gap-3 text-sm font-medium text-muted-foreground">
+              <div className="flex flex-col items-center sm:items-start">
+                <span className="text-foreground">0,99%</span>
+                <span className="text-xs">taxa da plataforma</span>
+              </div>
+            </div>
           </div>
         </div>
 
