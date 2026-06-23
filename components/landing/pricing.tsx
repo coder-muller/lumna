@@ -1,12 +1,4 @@
-import { CheckCircle2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Check, ArrowRight } from "lucide-react"
 import Link from "next/link"
 
 const highlights = [
@@ -20,68 +12,86 @@ const highlights = [
 
 export function Pricing() {
   return (
-    <section id="preco" className="py-24 sm:py-32">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-sm font-medium text-primary">Preço</p>
-          <h2 className="mt-3 font-heading text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
-            Simples e justo
+    <section id="preco" className="relative overflow-hidden py-24 sm:py-32">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-16 flex flex-col items-center text-center">
+          <h2 className="font-heading text-3xl font-medium tracking-tight sm:text-4xl">
+            Preço simples.{" "}
+            <span className="text-muted-foreground">Sem surpresas.</span>
           </h2>
-          <p className="mt-4 text-muted-foreground">
-            Você só paga quando recebe. Sem surpresas, sem pacotes complexos.
+          <p className="mt-4 max-w-lg text-muted-foreground">
+            Você só paga quando recebe. Sem pacotes complexos, sem letras
+            miúdas.
           </p>
         </div>
 
-        <div className="mx-auto mt-16 max-w-lg">
-          <Card className="relative overflow-hidden border-primary/20 bg-card/60 shadow-xl shadow-primary/5">
-            <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-primary via-primary/70 to-primary" />
-            <CardHeader className="text-center">
-              <CardDescription className="text-sm tracking-wider text-muted-foreground uppercase">
-                Taxa por transação
-              </CardDescription>
-              <CardTitle className="mt-2 flex items-baseline justify-center gap-1 font-heading text-6xl font-semibold tracking-tight">
-                0,99%
-              </CardTitle>
-              <CardDescription className="mt-2">
-                Sobre o valor de cada pagamento confirmado.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="rounded-xl bg-muted/50 p-4 text-center">
-                <p className="text-sm text-muted-foreground">
-                  Em uma cobrança de{" "}
-                  <span className="font-mono font-medium text-foreground">
-                    R$ 1.000,00
-                  </span>
-                </p>
-                <div className="mt-2 flex items-center justify-center gap-3 text-sm">
-                  <span className="text-muted-foreground">Taxa Lumna</span>
-                  <span className="font-mono font-medium text-foreground">
-                    R$ 9,90
-                  </span>
+        <div className="relative mx-auto max-w-2xl">
+          {/* Glow effect behind card */}
+          <div className="absolute -inset-1 rounded-[2rem] bg-linear-to-r from-primary/20 via-primary/10 to-primary/20 opacity-50 blur-xl" />
+
+          <div className="relative rounded-3xl border border-border/50 bg-background/80 p-8 shadow-2xl backdrop-blur-xl sm:p-10">
+            <div className="flex flex-col items-center gap-10 sm:flex-row sm:items-start">
+              <div className="flex-1 text-center sm:text-left">
+                <div className="mb-6 inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                  Taxa única
                 </div>
-                <div className="mt-1 flex items-center justify-center gap-3 text-sm">
-                  <span className="text-muted-foreground">Você recebe</span>
-                  <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
-                    R$ 990,10
-                  </span>
+                <div className="flex items-baseline justify-center gap-1 font-heading text-7xl font-medium tracking-tighter sm:justify-start">
+                  0,99<span className="text-4xl text-muted-foreground">%</span>
+                </div>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Sobre o valor de cada pagamento confirmado.
+                </p>
+
+                <div className="mt-8 rounded-2xl border border-border/50 bg-muted/30 p-4">
+                  <div className="mb-2 flex justify-between text-sm">
+                    <span className="text-muted-foreground">Cobrança</span>
+                    <span className="font-mono">R$ 1.000,00</span>
+                  </div>
+                  <div className="mb-3 flex justify-between text-sm">
+                    <span className="text-muted-foreground">Taxa Lumna</span>
+                    <span className="font-mono text-muted-foreground">
+                      - R$ 9,90
+                    </span>
+                  </div>
+                  <div className="mb-3 h-px w-full bg-border/50" />
+                  <div className="flex justify-between text-sm font-medium">
+                    <span>Você recebe</span>
+                    <span className="font-mono text-emerald-500">
+                      R$ 990,10
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <ul className="space-y-3">
-                {highlights.map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm">
-                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+              <div className="w-full bg-border/50 sm:h-auto sm:w-px" />
 
-              <Button size="lg" className="w-full" asChild>
-                <Link href="/register">Criar conta grátis</Link>
-              </Button>
-            </CardContent>
-          </Card>
+              <div className="flex h-full flex-1 flex-col justify-between">
+                <ul className="space-y-4">
+                  {highlights.map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-start gap-3 text-sm text-muted-foreground"
+                    >
+                      <div className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                        <Check className="size-3 text-primary" />
+                      </div>
+                      <span className="leading-tight">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Link
+                  href="/register"
+                  className="group relative mt-8 inline-flex h-12 w-full items-center justify-center overflow-hidden rounded-xl bg-foreground px-8 font-medium text-background transition-all hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  <span className="flex items-center gap-2">
+                    Criar conta grátis
+                    <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

@@ -1,49 +1,46 @@
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { ArrowRight } from "lucide-react"
+import { ArrowUpRight } from "lucide-react"
 
 export function CTA() {
   return (
-    <section className="py-24 sm:py-32">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl bg-primary px-6 py-16 text-primary-foreground sm:px-16 sm:py-24">
-          {/* Background pattern */}
-          <div className="pointer-events-none absolute inset-0 -z-0 opacity-20">
-            <div className="absolute top-0 left-1/4 h-64 w-64 -translate-y-1/2 rounded-full bg-white blur-3xl" />
-            <div className="absolute right-1/4 bottom-0 h-64 w-64 translate-y-1/2 rounded-full bg-white blur-3xl" />
+    <section className="relative overflow-hidden py-24 sm:py-32">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <div className="relative overflow-hidden rounded-[2.5rem] border border-border/50 bg-background px-6 py-20 text-center shadow-2xl sm:px-16 sm:py-28">
+          {/* Abstract background */}
+          <div className="pointer-events-none absolute inset-0 -z-10">
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] mask-[radial-gradient(ellipse_80%_80%_at_50%_50%,#000_20%,transparent_100%)] bg-size-[24px_24px]" />
+            <div className="absolute top-1/2 left-1/2 h-[400px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle_at_center,oklch(0.42_0.13_260/0.1),transparent_70%)] blur-3xl" />
           </div>
 
-          <div className="relative z-10 mx-auto max-w-2xl text-center">
-            <h2 className="font-heading text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+          <div className="relative z-10 mx-auto max-w-2xl">
+            <h2 className="font-heading text-4xl font-medium tracking-tighter text-balance sm:text-5xl md:text-6xl">
               Pronto para parar de se preocupar com cobranças?
             </h2>
-            <p className="mt-4 text-primary-foreground/80">
-              Crie sua conta gratuita e envie seu primeiro link de pagamento em
-              poucos minutos.
+            <p className="mt-6 text-lg text-muted-foreground">
+              Crie sua conta em segundos e envie seu primeiro link de pagamento
+              hoje mesmo.
             </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Button
-                size="lg"
-                variant="secondary"
-                asChild
-                className="group px-6"
+
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Link
+                href="/register"
+                className="group relative inline-flex h-14 w-full items-center justify-center overflow-hidden rounded-full bg-foreground px-8 font-medium text-background transition-all hover:scale-[1.02] active:scale-[0.98] sm:w-auto"
               >
-                <Link href="/register">
-                  Começar grátis
-                  <ArrowRight className="ml-1.5 transition-transform group-hover:translate-x-0.5" />
-                </Link>
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                asChild
-                className="border-primary-foreground/30 bg-transparent px-6 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                <span className="flex items-center gap-2 text-base">
+                  Começar gratuitamente
+                  <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </span>
+              </Link>
+              <Link
+                href="/login"
+                className="inline-flex h-14 w-full items-center justify-center rounded-full border border-border/50 bg-muted/30 px-8 font-medium text-foreground transition-colors hover:bg-muted/50 sm:w-auto"
               >
-                <Link href="/login">Já tenho conta</Link>
-              </Button>
+                Já tenho conta
+              </Link>
             </div>
-            <p className="mt-4 text-xs text-primary-foreground/60">
-              Sem cartão de crédito. Cancele quando quiser.
+
+            <p className="mt-6 text-xs text-muted-foreground">
+              Sem cartão de crédito. Sem taxas escondidas.
             </p>
           </div>
         </div>

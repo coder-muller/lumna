@@ -1,213 +1,205 @@
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { ArrowRight, CheckCircle2, Copy, Link2, Mail } from "lucide-react"
+import {
+  ArrowRight,
+  Copy,
+  Link2,
+  Sparkles,
+  CreditCard,
+  ArrowUpRight,
+} from "lucide-react"
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pt-32 pb-24 sm:pt-40 sm:pb-32">
-      {/* Background effects */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,oklch(0.42_0.13_260/0.08),transparent_50%)]" />
-        <div className="animate-aurora absolute top-0 left-1/2 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_center,oklch(0.42_0.13_260/0.12),transparent_70%)] blur-3xl" />
-        <div className="animate-aurora animation-delay-300 absolute top-20 right-1/4 h-[300px] w-[400px] rounded-full bg-[radial-gradient(circle_at_center,oklch(0.55_0.1_175/0.08),transparent_70%)] blur-3xl" />
+    <section className="relative flex min-h-svh flex-col justify-center overflow-hidden bg-background pt-32 pb-24 sm:pt-40 sm:pb-32">
+      {/* Abstract Background Elements */}
+      <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center">
+        {/* Grid pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] bg-size-[24px_24px]" />
+
+        {/* Glowing orbs */}
+        <div className="animate-pulse-glow absolute top-0 left-1/2 h-[600px] w-[800px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_center,oklch(0.42_0.13_260/0.15),transparent_60%)] blur-3xl" />
+        <div className="animate-pulse-glow animation-delay-750 absolute top-1/4 right-1/4 h-[400px] w-[400px] rounded-full bg-[radial-gradient(circle_at_center,oklch(0.55_0.1_175/0.1),transparent_60%)] blur-3xl" />
       </div>
 
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center text-center">
-          <Badge
-            variant="secondary"
-            className="animate-fade-in-up mb-6 h-7 px-3 text-xs font-medium opacity-0"
+          {/* Announcement Pill */}
+          <Link
+            href="#como-funciona"
+            className="animate-fade-in-up mb-8 inline-flex items-center gap-2 rounded-full border border-border/50 bg-muted/30 px-3 py-1.5 text-sm font-medium opacity-0 backdrop-blur-md transition-colors hover:bg-muted/50"
           >
-            Cobranças online sem complicação
-          </Badge>
+            <Sparkles className="size-4 text-primary" />
+            <span className="text-muted-foreground">
+              O novo padrão para pagamentos online
+            </span>
+            <span className="h-4 w-px bg-border" />
+            <span className="flex items-center text-foreground">
+              Descubra <ArrowRight className="ml-1 size-3" />
+            </span>
+          </Link>
 
-          <h1 className="animate-fade-in-up animation-delay-150 max-w-3xl font-heading text-4xl font-semibold tracking-tight text-balance opacity-0 sm:text-5xl md:text-6xl lg:text-7xl">
-            Receba pagamentos por link com a simplicidade que seu negócio merece
+          {/* Main Heading */}
+          <h1 className="animate-fade-in-up animation-delay-150 max-w-5xl font-heading text-5xl leading-[1.1] font-medium tracking-tighter text-balance opacity-0 sm:text-6xl md:text-7xl lg:text-[5.5rem]">
+            Receba por link com a{" "}
+            <span className="relative whitespace-nowrap">
+              <span className="relative z-10 bg-linear-to-b from-foreground to-foreground/70 bg-clip-text text-transparent">
+                simplicidade
+              </span>
+              <svg
+                className="absolute -bottom-2 left-0 -z-10 h-3 w-full text-primary/40"
+                viewBox="0 0 100 10"
+                preserveAspectRatio="none"
+              >
+                <path
+                  d="M0 5 Q 50 10 100 5"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="transparent"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </span>{" "}
+            que seu negócio merece.
           </h1>
 
-          <p className="animate-fade-in-up animation-delay-300 mt-6 max-w-2xl text-lg text-muted-foreground opacity-0 sm:text-xl">
+          {/* Subtitle */}
+          <p className="animate-fade-in-up animation-delay-300 mt-8 max-w-2xl text-lg leading-relaxed text-muted-foreground opacity-0 sm:text-xl">
             Cadastre clientes, gere cobranças avulsas e envie links de pagamento
-            seguros. Tudo processado pela Stripe, sem burocracia e sem taxa
-            mensal.
+            seguros. Processado pela Stripe, sem burocracia e sem taxa mensal.
           </p>
 
-          <div className="animate-fade-in-up animation-delay-450 mt-10 flex flex-col gap-3 opacity-0 sm:flex-row">
-            <Button size="lg" asChild className="group px-6">
-              <Link href="/register">
-                Começar grátis
-                <ArrowRight className="ml-1.5 transition-transform group-hover:translate-x-0.5" />
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" asChild className="px-6">
-              <Link href="#como-funciona">Ver como funciona</Link>
-            </Button>
+          {/* CTA Buttons */}
+          <div className="animate-fade-in-up animation-delay-450 mt-10 flex flex-col items-center gap-4 opacity-0 sm:flex-row">
+            <Link
+              href="/register"
+              className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full bg-primary px-8 font-medium text-primary-foreground transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <div className="absolute inset-0 flex h-full w-full transform-[skew(-12deg)_translateX(-100%)] justify-center group-hover:transform-[skew(-12deg)_translateX(100%)] group-hover:duration-1000">
+                <div className="relative h-full w-8 bg-white/20" />
+              </div>
+              <span className="flex items-center gap-2">
+                Começar gratuitamente
+                <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </span>
+            </Link>
           </div>
-
-          <p className="animate-fade-in-up animation-delay-600 mt-4 text-xs text-muted-foreground opacity-0">
-            Sem cartão de crédito. Taxa de apenas{" "}
-            <span className="font-mono font-medium text-foreground">0,99%</span>{" "}
-            por transação paga.
-          </p>
         </div>
 
-        {/* Product mockup */}
-        <div className="animate-fade-in-up animation-delay-750 relative mx-auto mt-20 max-w-4xl opacity-0">
-          <div className="perspective-1000 relative mx-auto max-w-[720px]">
-            {/* Main dashboard card */}
-            <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-card/80 shadow-2xl shadow-primary/5 backdrop-blur-sm">
-              {/* Window chrome */}
-              <div className="flex items-center gap-2 border-b border-border/50 bg-muted/40 px-4 py-3">
+        {/* Abstract Interface Representation */}
+        <div className="animate-fade-in-up animation-delay-600 relative mx-auto mt-24 max-w-5xl opacity-0">
+          <div className="relative rounded-2xl border border-border/50 bg-background/40 p-2 shadow-2xl shadow-black/5 backdrop-blur-xl">
+            {/* Inner border for glass effect */}
+            <div className="pointer-events-none absolute inset-0 rounded-2xl border border-white/10 dark:border-white/5" />
+
+            <div className="relative overflow-hidden rounded-xl border border-border/50 bg-card/80">
+              {/* Window Controls */}
+              <div className="flex items-center gap-2 border-b border-border/50 bg-muted/20 px-4 py-3">
                 <div className="flex gap-1.5">
-                  <div className="size-2.5 rounded-full bg-red-400/80" />
-                  <div className="size-2.5 rounded-full bg-amber-400/80" />
-                  <div className="size-2.5 rounded-full bg-emerald-400/80" />
+                  <div className="size-2.5 rounded-full bg-border/80" />
+                  <div className="size-2.5 rounded-full bg-border/80" />
+                  <div className="size-2.5 rounded-full bg-border/80" />
                 </div>
-                <div className="mx-auto flex items-center gap-2 rounded-lg bg-background/80 px-3 py-1 text-xs text-muted-foreground">
+                <div className="mx-auto flex h-6 items-center gap-2 rounded-md border border-border/50 bg-background/50 px-24 text-[10px] font-medium text-muted-foreground shadow-sm">
                   <Link2 className="size-3" />
-                  app.lumna.co/pagamentos
+                  app.lumna.co
                 </div>
               </div>
 
-              {/* Dashboard content */}
-              <div className="grid gap-4 p-5 sm:p-6 md:grid-cols-[1fr_280px]">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-muted-foreground">
-                        Nova cobrança
-                      </p>
-                      <p className="font-heading text-lg font-medium">
-                        Criar cobrança
-                      </p>
+              {/* Minimalist Dashboard UI */}
+              <div className="grid min-h-[400px] md:grid-cols-[240px_1fr]">
+                {/* Sidebar */}
+                <div className="hidden flex-col space-y-6 border-r border-border/50 bg-muted/10 p-4 md:flex">
+                  <div className="space-y-1">
+                    <div className="h-4 w-20 rounded bg-muted-foreground/20" />
+                    <div className="h-3 w-12 rounded bg-muted-foreground/10" />
+                  </div>
+                  <div className="space-y-2">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div
+                        key={i}
+                        className={`flex h-8 items-center rounded-md px-3 ${i === 2 ? "bg-primary/10 text-primary" : "text-muted-foreground"}`}
+                      >
+                        <div
+                          className={`h-3 w-16 rounded ${i === 2 ? "bg-primary/40" : "bg-muted-foreground/20"}`}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Main Content Area */}
+                <div className="relative flex flex-col gap-8 overflow-hidden p-6 md:p-10">
+                  {/* Decorative background glow inside the app */}
+                  <div className="pointer-events-none absolute top-0 right-0 h-64 w-64 translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-3xl" />
+
+                  <div className="flex items-end justify-between">
+                    <div className="space-y-2">
+                      <div className="h-8 w-48 rounded-lg bg-foreground/10" />
+                      <div className="h-4 w-64 rounded bg-muted-foreground/20" />
                     </div>
-                    <Badge variant="outline" className="text-xs">
-                      Avulsa
-                    </Badge>
+                    <div className="flex h-10 w-32 items-center justify-center rounded-full bg-primary/90 shadow-sm">
+                      <div className="h-3 w-16 rounded bg-primary-foreground/80" />
+                    </div>
                   </div>
 
-                  <div className="space-y-3">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-medium text-muted-foreground">
-                        Cliente
-                      </label>
-                      <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-background px-3 py-2 text-sm">
-                        <div className="flex size-6 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">
-                          ML
+                  {/* Payment Cards Grid */}
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {[
+                      {
+                        amount: "R$ 1.250,00",
+                        status: "Pago",
+                        color:
+                          "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+                      },
+                      {
+                        amount: "R$ 450,00",
+                        status: "Pendente",
+                        color:
+                          "bg-amber-500/10 text-amber-500 border-amber-500/20",
+                      },
+                    ].map((item, i) => (
+                      <div
+                        key={i}
+                        className="group relative overflow-hidden rounded-xl border border-border/50 bg-background/50 p-5 transition-all hover:bg-muted/50"
+                      >
+                        <div className="mb-4 flex items-start justify-between">
+                          <div className="flex size-10 items-center justify-center rounded-full bg-muted">
+                            <CreditCard className="size-5 text-muted-foreground" />
+                          </div>
+                          <div
+                            className={`rounded-full border px-2.5 py-1 text-[10px] font-medium ${item.color}`}
+                          >
+                            {item.status}
+                          </div>
                         </div>
-                        Maria Lopes
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-muted-foreground">
-                          Valor
-                        </label>
-                        <div className="rounded-lg border border-border/60 bg-background px-3 py-2 font-mono text-sm">
-                          R$ 1.250,00
+                        <div className="space-y-1">
+                          <div className="font-heading text-2xl font-medium tracking-tight">
+                            {item.amount}
+                          </div>
+                          <div className="h-3 w-24 rounded bg-muted-foreground/20" />
                         </div>
                       </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-muted-foreground">
-                          Vencimento
-                        </label>
-                        <div className="rounded-lg border border-border/60 bg-background px-3 py-2 text-sm">
-                          15/07/2026
-                        </div>
+                    ))}
+                  </div>
+
+                  {/* Floating Link Card - Linear Style */}
+                  <div className="animate-float absolute right-6 bottom-6 shadow-2xl lg:-right-12 lg:bottom-12">
+                    <div className="flex items-center gap-4 rounded-xl border border-border/60 bg-card/95 p-3 pr-4 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] backdrop-blur-xl">
+                      <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
+                        <Link2 className="size-5 text-primary" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium text-foreground">
+                          Link gerado com sucesso
+                        </p>
+                        <p className="font-mono text-[10px] text-muted-foreground">
+                          lumna.co/pay/ml-2506
+                        </p>
+                      </div>
+                      <div className="ml-2 flex size-8 cursor-pointer items-center justify-center rounded-md border border-border/50 bg-muted/50 transition-colors hover:bg-muted">
+                        <Copy className="size-3.5 text-muted-foreground" />
                       </div>
                     </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-medium text-muted-foreground">
-                        Descrição
-                      </label>
-                      <div className="rounded-lg border border-border/60 bg-background px-3 py-2 text-sm text-muted-foreground">
-                        Consultoria de branding — Junho/2026
-                      </div>
-                    </div>
-                  </div>
-
-                  <Button className="w-full">
-                    Gerar link de pagamento
-                    <ArrowRight className="ml-1.5 size-4" />
-                  </Button>
-                </div>
-
-                {/* Side panel */}
-                <div className="space-y-4 rounded-xl border border-border/60 bg-muted/30 p-4">
-                  <p className="font-heading text-sm font-medium">
-                    Resumo da cobrança
-                  </p>
-
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Valor</span>
-                      <span className="font-mono font-medium">R$ 1.250,00</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">
-                        Taxa Lumna (0,99%)
-                      </span>
-                      <span className="font-mono text-muted-foreground">
-                        R$ 12,38
-                      </span>
-                    </div>
-                    <div className="border-t border-border/60 pt-3">
-                      <div className="flex justify-between">
-                        <span className="font-medium">Você recebe</span>
-                        <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
-                          R$ 1.237,62
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="border-emerald/20 bg-emerald/5 dark:bg-emerald/10 rounded-lg border p-3">
-                    <div className="flex items-center gap-2 text-xs text-emerald-700 dark:text-emerald-300">
-                      <CheckCircle2 className="size-4" />
-                      Pagar antes do vencimento garante o valor integral.
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Floating payment link card */}
-            <div className="animate-float absolute top-8 -right-4 hidden w-64 sm:block lg:top-12 lg:-right-16">
-              <div className="overflow-hidden rounded-xl border border-border/60 bg-card/95 p-4 shadow-xl shadow-primary/5 backdrop-blur-sm">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Link2 className="size-3.5 text-primary" />
-                  Link de pagamento
-                </div>
-                <p className="mt-2 truncate font-mono text-xs text-foreground">
-                  lumna.co/pay/maria-lopes-2506
-                </p>
-                <div className="mt-3 flex gap-2">
-                  <Button variant="outline" size="xs" className="flex-1">
-                    <Copy className="mr-1 size-3" />
-                    Copiar
-                  </Button>
-                  <Button variant="outline" size="xs" className="flex-1">
-                    <Mail className="mr-1 size-3" />
-                    Email
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Floating status card */}
-            <div className="animate-float animation-delay-300 absolute bottom-12 -left-4 hidden w-52 sm:block lg:bottom-16 lg:-left-16">
-              <div className="overflow-hidden rounded-xl border border-border/60 bg-card/95 p-3 shadow-xl shadow-primary/5 backdrop-blur-sm">
-                <div className="flex items-center gap-2">
-                  <div className="bg-emerald/10 flex size-8 items-center justify-center rounded-full">
-                    <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium">Pagamento confirmado</p>
-                    <p className="font-mono text-[10px] text-muted-foreground">
-                      R$ 1.250,00 • há 2 min
-                    </p>
                   </div>
                 </div>
               </div>
