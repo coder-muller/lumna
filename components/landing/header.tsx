@@ -37,13 +37,13 @@ export function Header() {
 
         <div className="flex items-center gap-2">
           <Link
-            href="/login"
+            href="/sign-in"
             className="hidden px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:flex"
           >
             Entrar
           </Link>
           <Link
-            href="/register"
+            href="/sign-in"
             className="flex h-8 items-center justify-center rounded-full bg-foreground px-4 text-xs font-medium text-background transition-transform hover:scale-105 active:scale-95"
           >
             Criar conta

@@ -9,8 +9,8 @@ const footerLinks = {
     { label: "FAQ", href: "#faq" },
   ],
   Conta: [
-    { label: "Entrar", href: "/login" },
-    { label: "Criar conta", href: "/register" },
+    { label: "Entrar", href: "/sign-in" },
+    { label: "Criar conta", href: "/sign-in" },
   ],
   Legal: [
     { label: "Termos de uso", href: "#" },
