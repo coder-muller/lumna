@@ -93,17 +93,21 @@ function Carousel({
     setApi(api)
   }, [api, setApi])
 
+  const onInit = React.useCallback(
+    (api: CarouselApi) => onSelect(api),
+    [onSelect]
+  )
+
   React.useEffect(() => {
     if (!api) return
+    api.on("init", onInit)
     api.on("reInit", onSelect)
     api.on("select", onSelect)
-    queueMicrotask(() => onSelect(api))
 
     return () => {
-      api.off("reInit", onSelect)
-      api.off("select", onSelect)
+      api?.off("select", onSelect)
     }
-  }, [api, onSelect])
+  }, [api, onInit, onSelect])
 
   return (
     <CarouselContext.Provider
