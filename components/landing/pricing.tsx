@@ -178,7 +178,7 @@ export function Pricing() {
               </div>
 
               <Link
-                href="/register"
+                href="/sign-in"
                 className="group relative mt-8 inline-flex h-14 w-full items-center justify-center overflow-hidden rounded-full bg-background px-8 font-medium text-foreground transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 <span className="flex items-center gap-2">

@@ -23,7 +23,7 @@ export function CTA() {
 
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
-                href="/register"
+                href="/sign-in"
                 className="group relative inline-flex h-14 w-full items-center justify-center overflow-hidden rounded-full bg-foreground px-8 font-medium text-background transition-all hover:scale-[1.02] active:scale-[0.98] sm:w-auto"
               >
                 <span className="flex items-center gap-2 text-base">
@@ -32,7 +32,7 @@ export function CTA() {
                 </span>
               </Link>
               <Link
-                href="/login"
+                href="/sign-in"
                 className="inline-flex h-14 w-full items-center justify-center rounded-full border border-border/50 bg-muted/30 px-8 font-medium text-foreground transition-colors hover:bg-muted/50 sm:w-auto"
               >
                 Já tenho conta

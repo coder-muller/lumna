@@ -71,7 +71,7 @@ export function Hero() {
           {/* CTA Buttons */}
           <div className="animate-fade-in-up animation-delay-450 mt-10 flex flex-col items-center gap-4 opacity-0 sm:flex-row">
             <Link
-              href="/register"
+              href="/sign-in"
               className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full bg-primary px-8 font-medium text-primary-foreground transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               <div className="absolute inset-0 flex h-full w-full transform-[skew(-12deg)_translateX(-100%)] justify-center group-hover:transform-[skew(-12deg)_translateX(100%)] group-hover:duration-1000">
