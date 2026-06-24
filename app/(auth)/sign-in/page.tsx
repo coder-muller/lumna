@@ -2,9 +2,13 @@ import Link from "next/link"
 import { LumnaLogo } from "@/components/landing/logo"
 import { GithubOAuthButton } from "@/components/auth/sign-in/github-oauth-button"
 import { Sparkles } from "lucide-react"
+import { getSession } from "@/lib/auth/session"
+import { redirect } from "next/navigation"
 
-export default function SignInPage() {
-  // TODO: Server-side logic for redirecting authenticated users will go here
+export default async function SignInPage() {
+  // If user is already authenticated, redirect to dashboard
+  const session = await getSession()
+  if (session) redirect("/dashboard")
 
   return (
     <div className="relative flex min-h-svh w-full items-center justify-center overflow-hidden bg-background p-4 md:p-8">

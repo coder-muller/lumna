@@ -3,19 +3,23 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Loader2 } from "lucide-react"
+import { authClient } from "@/lib/auth/client"
 
 export function GithubOAuthButton() {
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSignIn = async () => {
     setIsLoading(true)
-    // Here will be the Better Auth sign in logic
-    // await authClient.signIn.social({ provider: "github" })
-
-    // Simulating loading for visual feedback
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 2000)
+    await authClient.signIn
+      .social({
+        provider: "github",
+        callbackURL: "/dashboard",
+        newUserCallbackURL: "/dashboard?newUser=true",
+        errorCallbackURL: "/sign-in?error=true",
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
   }
 
   return (
