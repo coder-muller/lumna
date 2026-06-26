@@ -20,7 +20,7 @@ export default async function DashboardPage() {
   return (
     <>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
+        <div>
           <h1 className="font-heading text-2xl font-semibold tracking-tight">
             Dashboard
           </h1>
@@ -41,7 +41,7 @@ export default async function DashboardPage() {
         {stats.map((stat) => (
           <div
             key={stat.label}
-            className="animate-fade-in-up rounded-xl border border-border/60 bg-card p-5 opacity-0 [animation-delay:150ms] [animation-fill-mode:forwards]"
+            className="animate-fade-in-up rounded-xl border border-border/60 bg-card p-5 opacity-0 fill-mode-[forwards] [animation-delay:150ms]"
           >
             <div className="flex items-center justify-between">
               <Skeleton className={stat.className} />
@@ -55,7 +55,7 @@ export default async function DashboardPage() {
 
       <section
         aria-label="Receita"
-        className="animate-fade-in-up rounded-xl border border-border/60 bg-card p-5 opacity-0 [animation-delay:300ms] [animation-fill-mode:forwards]"
+        className="animate-fade-in-up rounded-xl border border-border/60 bg-card p-5 opacity-0 fill-mode-[forwards] [animation-delay:300ms]"
       >
         <div className="mb-4 flex items-center justify-between">
           <Skeleton className="h-4 w-32" />
@@ -66,7 +66,7 @@ export default async function DashboardPage() {
 
       <section
         aria-label="Cobranças recentes"
-        className="animate-fade-in-up rounded-xl border border-border/60 bg-card opacity-0 [animation-delay:450ms] [animation-fill-mode:forwards]"
+        className="animate-fade-in-up rounded-xl border border-border/60 bg-card opacity-0 fill-mode-[forwards] [animation-delay:450ms]"
       >
         <div className="flex items-center justify-between border-b border-border/60 p-5">
           <Skeleton className="h-4 w-40" />

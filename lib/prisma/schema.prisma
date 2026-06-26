@@ -18,6 +18,7 @@ model Users {
   updatedAt     DateTime   @updatedAt
   sessions      Sessions[]
   accounts      Accounts[]
+  customers     Customers[]
 
   @@unique([email])
   @@map("users")
@@ -69,4 +70,27 @@ model Verifications {
 
   @@index([identifier])
   @@map("verifications")
+}
+
+enum CustomerStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+model Customers {
+  id        String   @id @default(uuid())
+
+  userId    String
+  users     Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name      String
+  email     String
+  phone     String?
+  status    CustomerStatus @default(ACTIVE)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("customers")
 }

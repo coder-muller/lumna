@@ -42,7 +42,7 @@ export function AppSidebar({ user }: { user: SessionUser }) {
                     Lumna
                   </span>
                   <span className="truncate text-xs text-muted-foreground">
-                    Cobranças por link
+                    Cobranças automatizadas
                   </span>
                 </div>
               </Link>
@@ -50,7 +50,6 @@ export function AppSidebar({ user }: { user: SessionUser }) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
@@ -79,7 +78,6 @@ export function AppSidebar({ user }: { user: SessionUser }) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-
       <SidebarFooter>
         <UserNav user={user} />
       </SidebarFooter>
