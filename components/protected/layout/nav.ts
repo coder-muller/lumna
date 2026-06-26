@@ -10,7 +10,7 @@ export type NavItem = {
 
 export const navItems: NavItem[] = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { title: "Clientes", href: "/clientes", icon: Users },
+  { title: "Clientes", href: "/customers", icon: Users },
   { title: "Cobranças", href: "/cobrancas", icon: ReceiptText },
   { title: "Configurações", href: "/configuracoes", icon: Settings },
 ]

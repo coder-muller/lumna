@@ -59,7 +59,7 @@ const getCustomersAction = async (
 ): Promise<GetCustomersResponse> => {
   const response = await getCustomers({
     page: data.page ?? 1,
-    limit: data.limit ?? 10,
+    limit: data.limit ?? 6,
     search: data.search ?? "",
     archived: data.archived ?? false,
   })
@@ -72,7 +72,7 @@ const getCustomersAction = async (
     data: response.data,
     total: response.total,
     page: data.page ?? 1,
-    limit: data.limit ?? 10,
+    limit: data.limit ?? 6,
   }
 }
 
@@ -148,7 +148,7 @@ export const useCustomers = (initialArchived: boolean = false) => {
 
   // States
   const [page, setPage] = useState(1)
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimit] = useState(6)
   const [search, setSearch] = useState("")
   const [archived, setArchived] = useState(initialArchived)
 
@@ -158,6 +158,7 @@ export const useCustomers = (initialArchived: boolean = false) => {
     isLoading: isLoadingCustomers,
     isFetching: isFetchingCustomers,
     error: errorCustomers,
+    refetch: refetchCustomers,
   } = useQuery({
     queryKey: ["customers", page, limit, search, archived],
     queryFn: () =>
@@ -252,6 +253,7 @@ export const useCustomers = (initialArchived: boolean = false) => {
     isLoadingCustomers,
     isFetchingCustomers,
     errorCustomers,
+    refetchCustomers,
 
     // Mutations
     createCustomerMutation,

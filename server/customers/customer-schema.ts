@@ -53,7 +53,7 @@ export const getCustomersSchema = z.object({
     .int("O limite deve ser um número inteiro")
     .min(1, "O limite deve ser maior que 0")
     .max(100, "O limite deve ser no máximo 100")
-    .default(10),
+    .default(6),
 
   archived: z.boolean().optional().default(false),
 })

@@ -24,7 +24,7 @@ export default async function ProtectedLayout({
           <AppSidebar user={session.user} />
           <SidebarInset>
             <Header />
-            <main className="flex flex-1 flex-col gap-6 p-4 md:gap-8 md:p-6">
+            <main className="container mx-auto flex flex-1 flex-col gap-6 p-4 md:gap-8 md:p-6">
               {children}
             </main>
           </SidebarInset>

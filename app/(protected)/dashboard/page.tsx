@@ -20,7 +20,7 @@ export default async function DashboardPage() {
   return (
     <>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
+        <div>
           <h1 className="font-heading text-2xl font-semibold tracking-tight">
             Dashboard
           </h1>

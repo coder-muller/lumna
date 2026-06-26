@@ -1,3 +1,5 @@
+"use server"
+
 import { getServerSession } from "@/lib/server/get-server-session"
 import { prisma } from "@/lib/prisma"
 import { Customers } from "@/lib/generated/prisma/client"
