@@ -10,6 +10,7 @@ export type InvoiceWithCustomer = Invoices & {
     name: string
     email: string
   }
+  isStripeCheckoutExpired: boolean
 }
 
 export type InvoiceCounts = {
@@ -141,8 +142,16 @@ export async function getInvoices(
     }),
   ])
 
+  const now = Date.now()
+
   return {
-    data: invoices,
+    data: invoices.map((invoice) => ({
+      ...invoice,
+      isStripeCheckoutExpired:
+        invoice.status === InvoiceStatus.OPEN &&
+        Boolean(invoice.stripeCheckoutExpiresAt) &&
+        invoice.stripeCheckoutExpiresAt!.getTime() < now,
+    })),
     total,
     counts: {
       all,

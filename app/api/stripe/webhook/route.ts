@@ -16,6 +16,37 @@ function getPaymentIntentId(
   return typeof paymentIntent === "string" ? paymentIntent : paymentIntent.id
 }
 
+function getStripeFeeAmount(balanceTransaction: Stripe.BalanceTransaction) {
+  const stripeFeeFromDetails = balanceTransaction.fee_details
+    .filter((fee) => fee.type === "stripe_fee")
+    .reduce((total, fee) => total + fee.amount, 0)
+
+  return stripeFeeFromDetails || balanceTransaction.fee
+}
+
+async function getPaymentStripeFeeAmount(paymentIntentId: string | null) {
+  if (!paymentIntentId) {
+    return 0
+  }
+
+  const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId, {
+    expand: ["latest_charge.balance_transaction"],
+  })
+  const latestCharge = paymentIntent.latest_charge
+
+  if (!latestCharge || typeof latestCharge === "string") {
+    return 0
+  }
+
+  const balanceTransaction = latestCharge.balance_transaction
+
+  if (!balanceTransaction || typeof balanceTransaction === "string") {
+    return 0
+  }
+
+  return getStripeFeeAmount(balanceTransaction)
+}
+
 async function handleCheckoutSessionCompleted(
   session: Stripe.Checkout.Session
 ) {
@@ -27,6 +58,7 @@ async function handleCheckoutSessionCompleted(
       id: true,
       userId: true,
       status: true,
+      value: true,
       platformFeeAmount: true,
     },
   })
@@ -36,6 +68,11 @@ async function handleCheckoutSessionCompleted(
   }
 
   const paymentIntentId = getPaymentIntentId(session.payment_intent)
+  const stripeFeeAmount = await getPaymentStripeFeeAmount(paymentIntentId)
+  const netReceivedAmount = Math.max(
+    0,
+    invoice.value - stripeFeeAmount - invoice.platformFeeAmount
+  )
 
   await prisma.$transaction(async (tx) => {
     const updatedInvoice = await tx.invoices.updateMany({
@@ -49,6 +86,8 @@ async function handleCheckoutSessionCompleted(
         status: InvoiceStatus.PAID,
         paidAt: new Date(),
         stripePaymentIntentId: paymentIntentId,
+        stripeFeeAmount,
+        netReceivedAmount,
       },
     })
 

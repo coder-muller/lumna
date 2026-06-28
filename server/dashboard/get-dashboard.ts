@@ -180,6 +180,8 @@ export async function getDashboard(): Promise<
     }
   }
 
+  const nowTime = Date.now()
+
   return {
     stats: {
       receivedThisMonth: receivedThisMonthAggregate._sum.value ?? 0,
@@ -188,6 +190,12 @@ export async function getDashboard(): Promise<
       totalCount,
     },
     revenueChart,
-    recentInvoices,
+    recentInvoices: recentInvoices.map((invoice) => ({
+      ...invoice,
+      isStripeCheckoutExpired:
+        invoice.status === InvoiceStatus.OPEN &&
+        Boolean(invoice.stripeCheckoutExpiresAt) &&
+        invoice.stripeCheckoutExpiresAt!.getTime() < nowTime,
+    })),
   }
 }

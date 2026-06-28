@@ -76,6 +76,9 @@ export default function InvoicesPage() {
   const [cancelingInvoiceId, setCancelingInvoiceId] = useState<string | null>(
     null
   )
+  const [regeneratingInvoiceId, setRegeneratingInvoiceId] = useState<
+    string | null
+  >(null)
   const { connectAccount } = useConnectAccountStatus()
 
   const {
@@ -86,6 +89,7 @@ export default function InvoicesPage() {
     refetchInvoices,
     createInvoiceMutation,
     cancelInvoiceMutation,
+    regenerateInvoiceCheckoutLinkMutation,
     handlePageChange,
     handleSearchChange,
     handleStatusChange,
@@ -149,6 +153,28 @@ export default function InvoicesPage() {
     }
   }
 
+  async function handleRegenerateInvoiceLink(invoiceId: string) {
+    if (!invoiceId) {
+      toast.error("Cobrança inválida")
+      return
+    }
+
+    setRegeneratingInvoiceId(invoiceId)
+
+    try {
+      const response =
+        await regenerateInvoiceCheckoutLinkMutation.mutateAsync(invoiceId)
+      setCreatedInvoice(response.data)
+      toast.success("Novo link de pagamento gerado")
+    } catch (error) {
+      toast.error(
+        getErrorMessage(error, "Ocorreu um erro ao gerar um novo link")
+      )
+    } finally {
+      setRegeneratingInvoiceId(null)
+    }
+  }
+
   const isSubmitting = form.formState.isSubmitting
   const counts = invoices?.counts ?? {
     all: 0,
@@ -205,7 +231,9 @@ export default function InvoicesPage() {
           invoices={invoices?.data ?? []}
           isFetching={isFetchingInvoices}
           cancelingInvoiceId={cancelingInvoiceId}
+          regeneratingInvoiceId={regeneratingInvoiceId}
           onCancel={handleCancelInvoice}
+          onRegenerateLink={handleRegenerateInvoiceLink}
         />
 
         <Separator className="my-4" />
