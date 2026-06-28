@@ -20,9 +20,13 @@ import { cn } from "@/lib/utils"
 import type { RevenueMonth } from "@/server/dashboard/get-dashboard"
 
 const chartConfig = {
-  amount: {
-    label: "Receita",
+  grossAmount: {
+    label: "Receita bruta",
     color: "var(--chart-1)",
+  },
+  netAmount: {
+    label: "Receita líquida",
+    color: "var(--chart-2)",
   },
 } satisfies ChartConfig
 
@@ -34,7 +38,8 @@ interface RevenueChartProps {
 export function RevenueChart({ data, isFetching }: RevenueChartProps) {
   const chartData = data.map((item) => ({
     month: item.label,
-    amount: item.amount,
+    grossAmount: item.grossAmount,
+    netAmount: item.netAmount,
   }))
 
   return (
@@ -81,11 +86,19 @@ export function RevenueChart({ data, isFetching }: RevenueChartProps) {
                 }
               />
               <Area
-                dataKey="amount"
+                dataKey="grossAmount"
                 type="monotone"
-                fill="var(--color-amount)"
-                fillOpacity={0.2}
-                stroke="var(--color-amount)"
+                fill="var(--color-grossAmount)"
+                fillOpacity={0.16}
+                stroke="var(--color-grossAmount)"
+                strokeWidth={2}
+              />
+              <Area
+                dataKey="netAmount"
+                type="monotone"
+                fill="var(--color-netAmount)"
+                fillOpacity={0.12}
+                stroke="var(--color-netAmount)"
                 strokeWidth={2}
               />
             </AreaChart>
