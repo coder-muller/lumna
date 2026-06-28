@@ -19,6 +19,7 @@ model Users {
   accounts      Accounts[]
   customers     Customers[]
   invoices      Invoices[]
+  stripeConnectAccount StripeConnectAccount?
 
   @@unique([email])
   @@map("users")
@@ -125,4 +126,40 @@ model Invoices {
   @@index([customerId])
   @@index([status])
   @@map("invoices")
+}
+
+enum StripeOnboardingStatus {
+  DEFERRED
+  IN_PROGRESS
+  COMPLETE
+  REJECTED
+}
+
+model StripeConnectAccount {
+  id String @id @default(cuid())
+
+  userId String @unique
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  stripeAccountId String @unique
+
+  status StripeOnboardingStatus @default(DEFERRED)
+
+  chargesEnabled Boolean @default(false)
+  payoutsEnabled Boolean @default(false)
+
+  pendingEarnings Int @default(0)
+  salesCount Int @default(0)
+  platformFeesCollected Int @default(0)
+
+  onboardingPromptShown Boolean @default(false)
+  onboardingPromptAt DateTime?
+  onboardingCompletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+
+  @@index([stripeAccountId])
+  @@index([status])
 }

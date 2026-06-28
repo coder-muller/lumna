@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { nextCookies } from "better-auth/next-js"
 import { prisma } from "../prisma"
+import { createStripeConnectAccountForUser } from "@/server/stripe/create-connect-account"
 
 export const auth = betterAuth({
   appName: "Lumna",
@@ -22,6 +23,26 @@ export const auth = betterAuth({
   user: {
     deleteUser: {
       enabled: true,
+    },
+  },
+
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          try {
+            await createStripeConnectAccountForUser({
+              userId: user.id,
+              email: user.email,
+            })
+          } catch (error) {
+            console.error(
+              "[Better Auth] Erro ao criar conta Stripe Express:",
+              error
+            )
+          }
+        },
+      },
     },
   },
 
