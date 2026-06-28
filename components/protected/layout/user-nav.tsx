@@ -96,7 +96,7 @@ export function UserNav({ user }: { user: SessionUser }) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href="/configuracoes">
+              <Link href="/settings">
                 <Settings className="size-4" />
                 Configurações
               </Link>
