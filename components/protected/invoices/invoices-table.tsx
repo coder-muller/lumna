@@ -31,8 +31,9 @@ import { formatCurrency } from "@/lib/format-currency"
 import { cn } from "@/lib/utils"
 import type { InvoiceStatus } from "@/lib/generated/prisma/client"
 import type { InvoiceWithCustomer } from "@/server/invoices/get-invoices"
-import { MoreHorizontalIcon, XOctagonIcon } from "lucide-react"
+import { CopyIcon, MoreHorizontalIcon, XOctagonIcon } from "lucide-react"
 import { format } from "date-fns"
+import { toast } from "sonner"
 
 const INVOICE_STATUS = {
   OPEN: "OPEN",
@@ -68,6 +69,11 @@ export function InvoicesTable({
   cancelingInvoiceId,
   onCancel,
 }: InvoicesTableProps) {
+  async function handleCopyPaymentLink(url: string) {
+    await navigator.clipboard.writeText(url)
+    toast.success("Link de pagamento copiado")
+  }
+
   return (
     <div
       className={cn(
@@ -90,6 +96,8 @@ export function InvoicesTable({
           {invoices.map((invoice) => {
             const canCancel = invoice.status === INVOICE_STATUS.OPEN
             const isCanceling = cancelingInvoiceId === invoice.id
+            const canCopyPaymentLink =
+              canCancel && Boolean(invoice.stripeCheckoutUrl)
 
             return (
               <TableRow key={invoice.id}>
@@ -132,6 +140,16 @@ export function InvoicesTable({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
+                      {canCopyPaymentLink && invoice.stripeCheckoutUrl ? (
+                        <DropdownMenuItem
+                          onClick={() =>
+                            handleCopyPaymentLink(invoice.stripeCheckoutUrl!)
+                          }
+                        >
+                          <CopyIcon />
+                          Copiar link
+                        </DropdownMenuItem>
+                      ) : null}
                       {canCancel ? (
                         <AlertDialog>
                           <AlertDialogTrigger asChild>

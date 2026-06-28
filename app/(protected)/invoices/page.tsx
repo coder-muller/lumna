@@ -2,6 +2,14 @@
 
 import { Button } from "@/components/ui/button"
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
@@ -17,13 +25,14 @@ import { InvoicesPagination } from "@/components/protected/invoices/invoices-pag
 import { InvoicesTable } from "@/components/protected/invoices/invoices-table"
 import { Separator } from "@/components/ui/separator"
 import { useInvoices } from "@/hooks/use-invoices"
-import type { InvoiceStatus } from "@/lib/generated/prisma/client"
+import { useConnectAccountStatus } from "@/hooks/use-connect-account-status"
+import type { InvoiceStatus, Invoices } from "@/lib/generated/prisma/client"
 import {
   invoiceFormSchema,
   type InvoiceFormInput,
 } from "@/server/invoices/invoice-schema"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { PlusIcon, SearchIcon } from "lucide-react"
+import { CopyIcon, PlusIcon, SearchIcon } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -63,9 +72,11 @@ const INVOICE_STATUS = {
 
 export default function InvoicesPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [createdInvoice, setCreatedInvoice] = useState<Invoices | null>(null)
   const [cancelingInvoiceId, setCancelingInvoiceId] = useState<string | null>(
     null
   )
+  const { connectAccount } = useConnectAccountStatus()
 
   const {
     invoices,
@@ -93,6 +104,11 @@ export default function InvoicesPage() {
   })
 
   function handleOpenCreateDialog() {
+    if (!canCreatePaymentLink) {
+      toast.error(connectRequirementMessage)
+      return
+    }
+
     form.reset(emptyFormValues)
     setIsDialogOpen(true)
   }
@@ -104,8 +120,9 @@ export default function InvoicesPage() {
 
   async function handleSubmitInvoice(data: InvoiceFormInput) {
     try {
-      await createInvoiceMutation.mutateAsync(data)
-      toast.success("Cobrança criada com sucesso")
+      const response = await createInvoiceMutation.mutateAsync(data)
+      setCreatedInvoice(response.data)
+      toast.success("Cobrança criada com link de pagamento")
       resetDialog()
     } catch (error) {
       toast.error(getErrorMessage(error, "Ocorreu um erro ao criar a cobrança"))
@@ -138,6 +155,22 @@ export default function InvoicesPage() {
     open: 0,
     paid: 0,
     canceled: 0,
+  }
+  const canCreatePaymentLink = Boolean(
+    connectAccount?.status === "COMPLETE" &&
+    connectAccount.chargesEnabled &&
+    connectAccount.payoutsEnabled
+  )
+  const connectRequirementMessage =
+    "Finalize a conexão com a Stripe antes de criar cobranças com link de pagamento."
+
+  async function handleCopyCreatedInvoiceLink() {
+    if (!createdInvoice?.stripeCheckoutUrl) {
+      return
+    }
+
+    await navigator.clipboard.writeText(createdInvoice.stripeCheckoutUrl)
+    toast.success("Link de pagamento copiado")
   }
 
   const content = (() => {
@@ -209,12 +242,21 @@ export default function InvoicesPage() {
               onChange={(event) => handleSearchChange(event.target.value)}
             />
           </InputGroup>
-          <Button variant="default" onClick={handleOpenCreateDialog}>
+          <Button
+            variant="default"
+            onClick={handleOpenCreateDialog}
+            disabled={!canCreatePaymentLink}
+          >
             <PlusIcon />
             <span className="hidden md:block">Nova cobrança</span>
             <span className="md:hidden">Cobrança</span>
           </Button>
         </div>
+        {!canCreatePaymentLink ? (
+          <p className="text-sm text-muted-foreground">
+            {connectRequirementMessage}
+          </p>
+        ) : null}
         <Tabs
           value={statusToTabValue(status)}
           onValueChange={(value) => handleStatusChange(tabValueToStatus(value))}
@@ -241,7 +283,49 @@ export default function InvoicesPage() {
         onSubmit={handleSubmitInvoice}
         isSubmitting={isSubmitting}
         form={form}
+        canCreatePaymentLink={canCreatePaymentLink}
+        connectRequirementMessage={connectRequirementMessage}
       />
+      <Dialog
+        open={Boolean(createdInvoice)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setCreatedInvoice(null)
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Link de pagamento criado</DialogTitle>
+            <DialogDescription>
+              Copie o link e envie para o cliente pagar com cartão.
+            </DialogDescription>
+          </DialogHeader>
+          <InputGroup>
+            <InputGroupInput
+              readOnly
+              value={createdInvoice?.stripeCheckoutUrl ?? ""}
+            />
+            <InputGroupAddon>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={handleCopyCreatedInvoiceLink}
+                disabled={!createdInvoice?.stripeCheckoutUrl}
+              >
+                <CopyIcon />
+              </Button>
+            </InputGroupAddon>
+          </InputGroup>
+          <DialogFooter>
+            <Button type="button" onClick={handleCopyCreatedInvoiceLink}>
+              <CopyIcon />
+              Copiar link
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }
