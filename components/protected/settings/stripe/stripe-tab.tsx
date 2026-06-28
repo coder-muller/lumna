@@ -1,5 +1,6 @@
 import { AlertCircleIcon, CheckCircle2Icon, Clock3Icon } from "lucide-react"
 
+import { StripeDashboardButton } from "@/components/protected/stripe/stripe-dashboard-button"
 import { StripeOnboardingButton } from "@/components/protected/stripe/stripe-onboarding-button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
@@ -41,7 +42,8 @@ const statusContent = {
     icon: CheckCircle2Icon,
     badge: "Conectada",
     title: "Conta conectada",
-    description: "Sua conta Stripe está pronta para operar.",
+    description:
+      "Sua conta Stripe está pronta para receber pagamentos e fazer repasses.",
     buttonLabel: null,
     badgeVariant: "default",
   },
@@ -94,6 +96,19 @@ export default function StripeTab({ account }: StripeTabProps) {
               />
             ) : null}
           </div>
+
+          {account.status === "COMPLETE" ? (
+            <div className="mt-4 border-t pt-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm text-muted-foreground">
+                  Acesse o dashboard da Stripe para acompanhar seu saldo,
+                  configurar dados bancários e solicitar repasses quando
+                  estiverem disponíveis.
+                </p>
+                <StripeDashboardButton className="w-full sm:w-auto" size="sm" />
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

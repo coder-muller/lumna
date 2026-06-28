@@ -9,7 +9,7 @@ type CreateInvoiceCheckoutSessionParams = {
   title: string
   description: string | null
   value: number
-  platformFeeAmount: number
+  applicationFeeAmount: number
   stripeAccountId: string
 }
 
@@ -21,7 +21,7 @@ export async function createInvoiceCheckoutSession({
   title,
   description,
   value,
-  platformFeeAmount,
+  applicationFeeAmount,
   stripeAccountId,
 }: CreateInvoiceCheckoutSessionParams) {
   const appUrl = getAppUrl()
@@ -50,7 +50,7 @@ export async function createInvoiceCheckoutSession({
       customerId,
     },
     payment_intent_data: {
-      application_fee_amount: platformFeeAmount,
+      application_fee_amount: applicationFeeAmount,
       transfer_data: {
         destination: stripeAccountId,
       },

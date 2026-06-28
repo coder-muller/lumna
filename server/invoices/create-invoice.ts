@@ -5,7 +5,10 @@ import { randomUUID } from "node:crypto"
 import { getServerSession } from "@/lib/server/get-server-session"
 import { prisma } from "@/lib/prisma"
 import { CustomerStatus, Invoices } from "@/lib/generated/prisma/client"
-import { calculateLumnaPlatformFeeAmount } from "@/lib/stripe/fee"
+import {
+  calculateCheckoutApplicationFeeAmount,
+  calculateLumnaPlatformFeeAmount,
+} from "@/lib/stripe/fee"
 import { createInvoiceCheckoutSession } from "./checkout-session"
 import { invoiceFormSchema, InvoiceFormInput } from "./invoice-schema"
 
@@ -68,6 +71,9 @@ export async function createInvoice(
 
   const invoiceId = randomUUID()
   const platformFeeAmount = calculateLumnaPlatformFeeAmount(result.data.value)
+  const applicationFeeAmount = calculateCheckoutApplicationFeeAmount(
+    result.data.value
+  )
 
   const checkoutSession = await createInvoiceCheckoutSession({
     invoiceId,
@@ -77,7 +83,7 @@ export async function createInvoice(
     title: result.data.title,
     description: result.data.description,
     value: result.data.value,
-    platformFeeAmount,
+    applicationFeeAmount,
     stripeAccountId: stripeConnectAccount.stripeAccountId,
   })
 

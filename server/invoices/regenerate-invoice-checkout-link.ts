@@ -1,7 +1,10 @@
 "use server"
 
 import { InvoiceStatus, Invoices } from "@/lib/generated/prisma/client"
-import { calculateLumnaPlatformFeeAmount } from "@/lib/stripe/fee"
+import {
+  calculateCheckoutApplicationFeeAmount,
+  calculateLumnaPlatformFeeAmount,
+} from "@/lib/stripe/fee"
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "@/lib/server/get-server-session"
 
@@ -93,6 +96,9 @@ export async function regenerateInvoiceCheckoutLink(
 
   const platformFeeAmount =
     invoice.platformFeeAmount || calculateLumnaPlatformFeeAmount(invoice.value)
+  const applicationFeeAmount = calculateCheckoutApplicationFeeAmount(
+    invoice.value
+  )
 
   const checkoutSession = await createInvoiceCheckoutSession({
     invoiceId: invoice.id,
@@ -102,7 +108,7 @@ export async function regenerateInvoiceCheckoutLink(
     title: invoice.title,
     description: invoice.description,
     value: invoice.value,
-    platformFeeAmount,
+    applicationFeeAmount,
     stripeAccountId: stripeConnectAccount.stripeAccountId,
   })
 
