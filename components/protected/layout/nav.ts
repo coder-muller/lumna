@@ -11,6 +11,6 @@ export type NavItem = {
 export const navItems: NavItem[] = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { title: "Clientes", href: "/customers", icon: Users },
-  { title: "Cobranças", href: "/cobrancas", icon: ReceiptText },
+  { title: "Cobranças", href: "/invoices", icon: ReceiptText },
   { title: "Configurações", href: "/configuracoes", icon: Settings },
 ]
