@@ -125,6 +125,9 @@ export const useInvoices = () => {
       queryClient.invalidateQueries({
         queryKey: ["invoices"],
       })
+      queryClient.invalidateQueries({
+        queryKey: ["dashboard"],
+      })
     },
   })
 
@@ -133,6 +136,9 @@ export const useInvoices = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["invoices"],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ["dashboard"],
       })
     },
   })

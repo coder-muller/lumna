@@ -27,6 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { formatCurrency } from "@/lib/format-currency"
 import { cn } from "@/lib/utils"
 import type { InvoiceStatus } from "@/lib/generated/prisma/client"
 import type { InvoiceWithCustomer } from "@/server/invoices/get-invoices"
@@ -52,13 +53,6 @@ const statusVariants: Record<
   OPEN: "outline",
   PAID: "default",
   CANCELED: "destructive",
-}
-
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(value / 100)
 }
 
 interface InvoicesTableProps {
