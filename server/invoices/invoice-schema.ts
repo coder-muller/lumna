@@ -1,5 +1,4 @@
 import { z } from "zod"
-import { InvoiceStatus } from "@/lib/generated/prisma/client"
 
 export const invoiceFormSchema = z.object({
   customerId: z.uuid("Cliente inválido"),
@@ -51,7 +50,7 @@ export const getInvoicesSchema = z.object({
     .max(100, "O limite deve ser no máximo 100")
     .default(6),
 
-  status: z.enum(InvoiceStatus).optional(),
+  status: z.enum(["OPEN", "PAID", "CANCELED"]).optional(),
 })
 
 export type InvoiceFormInput = z.input<typeof invoiceFormSchema>

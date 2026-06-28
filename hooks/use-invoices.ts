@@ -3,14 +3,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 
-import { InvoiceStatus, Invoices } from "@/lib/generated/prisma/client"
+import type { InvoiceStatus, Invoices } from "@/lib/generated/prisma/client"
 
 import { getInvoices } from "@/server/invoices/get-invoices"
 import { createInvoice } from "@/server/invoices/create-invoice"
 import { cancelInvoice } from "@/server/invoices/cancel-invoice"
 
 import type { InvoiceFormInput } from "@/server/invoices/invoice-schema"
-import type { InvoiceWithCustomer } from "@/server/invoices/get-invoices"
+import type {
+  InvoiceCounts,
+  InvoiceWithCustomer,
+} from "@/server/invoices/get-invoices"
 
 // Request Types
 type GetInvoicesRequest = {
@@ -26,6 +29,7 @@ type GetInvoicesResponse = {
   total: number
   page: number
   limit: number
+  counts: InvoiceCounts
 }
 
 type CreateInvoiceResponse = {
@@ -54,6 +58,7 @@ const getInvoicesAction = async (
   return {
     data: response.data,
     total: response.total,
+    counts: response.counts,
     page: data.page ?? 1,
     limit: data.limit ?? 6,
   }
