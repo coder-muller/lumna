@@ -46,6 +46,8 @@ interface InvoicesDialogProps {
   onSubmit: (data: InvoiceFormInput) => void
   isSubmitting: boolean
   form: UseFormReturn<InvoiceFormInput>
+  canCreatePaymentLink: boolean
+  connectRequirementMessage?: string
 }
 
 function formatCurrencyInput(value: unknown) {
@@ -69,6 +71,8 @@ export function InvoicesDialog({
   onSubmit,
   isSubmitting,
   form,
+  canCreatePaymentLink,
+  connectRequirementMessage,
 }: InvoicesDialogProps) {
   const [isCustomerPopoverOpen, setIsCustomerPopoverOpen] = useState(false)
   const {
@@ -95,6 +99,11 @@ export function InvoicesDialog({
         </DialogHeader>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
+            {!canCreatePaymentLink && connectRequirementMessage ? (
+              <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+                {connectRequirementMessage}
+              </div>
+            ) : null}
             <Controller
               control={form.control}
               name="customerId"
@@ -113,7 +122,7 @@ export function InvoicesDialog({
                           role="combobox"
                           aria-expanded={isCustomerPopoverOpen}
                           aria-invalid={fieldState.invalid}
-                          disabled={isSubmitting}
+                          disabled={isSubmitting || !canCreatePaymentLink}
                           className="w-full justify-between"
                         >
                           <span className="truncate">
@@ -186,7 +195,7 @@ export function InvoicesDialog({
                       {...field}
                       aria-invalid={fieldState.invalid}
                       placeholder="Mensalidade de junho"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || !canCreatePaymentLink}
                       type="text"
                     />
                   </FieldContent>
@@ -207,7 +216,7 @@ export function InvoicesDialog({
                       {...field}
                       aria-invalid={fieldState.invalid}
                       placeholder="Detalhes da cobrança"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || !canCreatePaymentLink}
                       value={field.value ? String(field.value) : ""}
                     />
                   </FieldContent>
@@ -229,7 +238,7 @@ export function InvoicesDialog({
                       ref={field.ref}
                       aria-invalid={fieldState.invalid}
                       placeholder="R$ 0,00"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || !canCreatePaymentLink}
                       inputMode="numeric"
                       value={formatCurrencyInput(field.value)}
                       onBlur={field.onBlur}
@@ -248,7 +257,12 @@ export function InvoicesDialog({
               <Button
                 type="submit"
                 variant="default"
-                disabled={isSubmitting || !hasSelectedCustomer || !hasCustomers}
+                disabled={
+                  isSubmitting ||
+                  !hasSelectedCustomer ||
+                  !hasCustomers ||
+                  !canCreatePaymentLink
+                }
                 className={cn(!hasCustomers && "cursor-not-allowed")}
               >
                 {isSubmitting ? <Spinner /> : <CheckIcon />}

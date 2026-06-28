@@ -62,36 +62,43 @@ export function RecentInvoices({ invoices, isFetching }: RecentInvoicesProps) {
         </CardHeader>
         <CardContent className="p-0">
           <div className="divide-y divide-border/60">
-            {invoices.map((invoice) => (
-              <div
-                key={invoice.id}
-                className="flex items-center gap-4 p-4 transition-colors hover:bg-muted/30"
-              >
-                <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium">
-                  {getInitials(invoice.customer.name)}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium">
-                    {invoice.title}
-                  </p>
-                  <p className="truncate text-xs text-muted-foreground">
-                    {invoice.customer.name}
-                  </p>
-                </div>
-                <Badge
-                  variant={statusVariants[invoice.status]}
-                  className="hidden sm:inline-flex"
+            {invoices.map((invoice) => {
+              const displayedAmount =
+                invoice.status === "PAID"
+                  ? (invoice.netReceivedAmount ?? invoice.value)
+                  : invoice.value
+
+              return (
+                <div
+                  key={invoice.id}
+                  className="flex items-center gap-4 p-4 transition-colors hover:bg-muted/30"
                 >
-                  {statusLabels[invoice.status]}
-                </Badge>
-                <p className="shrink-0 text-sm font-medium tabular-nums">
-                  {formatCurrency(invoice.value)}
-                </p>
-                <p className="hidden shrink-0 text-xs text-muted-foreground md:block">
-                  {format(invoice.createdAt, "dd/MM/yyyy")}
-                </p>
-              </div>
-            ))}
+                  <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium">
+                    {getInitials(invoice.customer.name)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">
+                      {invoice.title}
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {invoice.customer.name}
+                    </p>
+                  </div>
+                  <Badge
+                    variant={statusVariants[invoice.status]}
+                    className="hidden sm:inline-flex"
+                  >
+                    {statusLabels[invoice.status]}
+                  </Badge>
+                  <p className="shrink-0 text-sm font-medium tabular-nums">
+                    {formatCurrency(displayedAmount)}
+                  </p>
+                  <p className="hidden shrink-0 text-xs text-muted-foreground md:block">
+                    {format(invoice.createdAt, "dd/MM/yyyy")}
+                  </p>
+                </div>
+              )
+            })}
           </div>
         </CardContent>
       </Card>

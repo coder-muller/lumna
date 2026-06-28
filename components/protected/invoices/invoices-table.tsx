@@ -31,8 +31,14 @@ import { formatCurrency } from "@/lib/format-currency"
 import { cn } from "@/lib/utils"
 import type { InvoiceStatus } from "@/lib/generated/prisma/client"
 import type { InvoiceWithCustomer } from "@/server/invoices/get-invoices"
-import { MoreHorizontalIcon, XOctagonIcon } from "lucide-react"
+import {
+  CopyIcon,
+  MoreHorizontalIcon,
+  RefreshCcwIcon,
+  XOctagonIcon,
+} from "lucide-react"
 import { format } from "date-fns"
+import { toast } from "sonner"
 
 const INVOICE_STATUS = {
   OPEN: "OPEN",
@@ -59,15 +65,24 @@ interface InvoicesTableProps {
   invoices: InvoiceWithCustomer[]
   isFetching: boolean
   cancelingInvoiceId: string | null
+  regeneratingInvoiceId: string | null
   onCancel: (invoiceId: string) => Promise<void>
+  onRegenerateLink: (invoiceId: string) => Promise<void>
 }
 
 export function InvoicesTable({
   invoices,
   isFetching,
   cancelingInvoiceId,
+  regeneratingInvoiceId,
   onCancel,
+  onRegenerateLink,
 }: InvoicesTableProps) {
+  async function handleCopyPaymentLink(url: string) {
+    await navigator.clipboard.writeText(url)
+    toast.success("Link de pagamento copiado")
+  }
+
   return (
     <div
       className={cn(
@@ -81,6 +96,7 @@ export function InvoicesTable({
             <TableHead>Cobrança</TableHead>
             <TableHead>Cliente</TableHead>
             <TableHead className="text-center">Data de Emissão</TableHead>
+            <TableHead className="text-center">Expira em</TableHead>
             <TableHead className="text-right">Valor</TableHead>
             <TableHead className="text-center">Status</TableHead>
             <TableHead className="w-[25px] text-center">Ações</TableHead>
@@ -90,6 +106,11 @@ export function InvoicesTable({
           {invoices.map((invoice) => {
             const canCancel = invoice.status === INVOICE_STATUS.OPEN
             const isCanceling = cancelingInvoiceId === invoice.id
+            const isRegenerating = regeneratingInvoiceId === invoice.id
+            const isExpired = invoice.isStripeCheckoutExpired
+            const canCopyPaymentLink =
+              canCancel && !isExpired && Boolean(invoice.stripeCheckoutUrl)
+            const canRegeneratePaymentLink = canCancel && isExpired
 
             return (
               <TableRow key={invoice.id}>
@@ -116,12 +137,39 @@ export function InvoicesTable({
                 <TableCell className="text-center">
                   {format(invoice.createdAt, "dd/MM/yyyy")}
                 </TableCell>
+                <TableCell className="text-center">
+                  <div>
+                    <p className="text-sm tabular-nums">
+                      {invoice.stripeCheckoutExpiresAt
+                        ? format(
+                            invoice.stripeCheckoutExpiresAt,
+                            "dd/MM/yyyy HH:mm"
+                          )
+                        : "Sem expiração"}
+                    </p>
+                    {isExpired ? (
+                      <p className="text-xs text-destructive">Expirada</p>
+                    ) : null}
+                  </div>
+                </TableCell>
                 <TableCell className="text-right tabular-nums">
-                  {formatCurrency(invoice.value)}
+                  <div>
+                    <p>{formatCurrency(invoice.value)}</p>
+                    {invoice.status === INVOICE_STATUS.PAID &&
+                    invoice.netReceivedAmount !== null ? (
+                      <p className="text-xs text-muted-foreground">
+                        {formatCurrency(invoice.netReceivedAmount)}
+                      </p>
+                    ) : null}
+                  </div>
                 </TableCell>
                 <TableCell className="text-center">
-                  <Badge variant={statusVariants[invoice.status]}>
-                    {statusLabels[invoice.status]}
+                  <Badge
+                    variant={
+                      isExpired ? "secondary" : statusVariants[invoice.status]
+                    }
+                  >
+                    {isExpired ? "Expirada" : statusLabels[invoice.status]}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-center">
@@ -132,6 +180,25 @@ export function InvoicesTable({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
+                      {canCopyPaymentLink && invoice.stripeCheckoutUrl ? (
+                        <DropdownMenuItem
+                          onClick={() =>
+                            handleCopyPaymentLink(invoice.stripeCheckoutUrl!)
+                          }
+                        >
+                          <CopyIcon />
+                          Copiar link
+                        </DropdownMenuItem>
+                      ) : null}
+                      {canRegeneratePaymentLink ? (
+                        <DropdownMenuItem
+                          disabled={isRegenerating}
+                          onClick={() => onRegenerateLink(invoice.id)}
+                        >
+                          <RefreshCcwIcon />
+                          {isRegenerating ? "Gerando..." : "Gerar novo link"}
+                        </DropdownMenuItem>
+                      ) : null}
                       {canCancel ? (
                         <AlertDialog>
                           <AlertDialogTrigger asChild>

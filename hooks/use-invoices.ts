@@ -8,6 +8,7 @@ import type { InvoiceStatus, Invoices } from "@/lib/generated/prisma/client"
 import { getInvoices } from "@/server/invoices/get-invoices"
 import { createInvoice } from "@/server/invoices/create-invoice"
 import { cancelInvoice } from "@/server/invoices/cancel-invoice"
+import { regenerateInvoiceCheckoutLink } from "@/server/invoices/regenerate-invoice-checkout-link"
 
 import type { InvoiceFormInput } from "@/server/invoices/invoice-schema"
 import type {
@@ -37,6 +38,10 @@ type CreateInvoiceResponse = {
 }
 
 type CancelInvoiceResponse = {
+  data: Invoices
+}
+
+type RegenerateInvoiceCheckoutLinkResponse = {
   data: Invoices
 }
 
@@ -90,6 +95,20 @@ const cancelInvoiceAction = async (
   return response
 }
 
+const regenerateInvoiceCheckoutLinkAction = async (
+  invoiceId: string
+): Promise<RegenerateInvoiceCheckoutLinkResponse> => {
+  const response = await regenerateInvoiceCheckoutLink({
+    id: invoiceId,
+  })
+
+  if ("error" in response) {
+    throw new Error(response.error)
+  }
+
+  return response
+}
+
 // Main Hook
 export const useInvoices = () => {
   const queryClient = useQueryClient()
@@ -116,6 +135,7 @@ export const useInvoices = () => {
         search,
         status,
       }),
+    refetchInterval: 60_000,
   })
 
   // Mutations
@@ -139,6 +159,15 @@ export const useInvoices = () => {
       })
       queryClient.invalidateQueries({
         queryKey: ["dashboard"],
+      })
+    },
+  })
+
+  const regenerateInvoiceCheckoutLinkMutation = useMutation({
+    mutationFn: regenerateInvoiceCheckoutLinkAction,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["invoices"],
       })
     },
   })
@@ -182,6 +211,7 @@ export const useInvoices = () => {
     // Mutations
     createInvoiceMutation,
     cancelInvoiceMutation,
+    regenerateInvoiceCheckoutLinkMutation,
 
     // Handlers
     handlePageChange,

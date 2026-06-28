@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { Plus } from "lucide-react"
 
+import { ConnectOnboardingBanner } from "@/components/protected/dashboard/connect-onboarding-banner"
 import { DashboardErrorState } from "@/components/protected/dashboard/error-state"
 import { DashboardLoadingState } from "@/components/protected/dashboard/loading-state"
 import { RecentEmptyState } from "@/components/protected/dashboard/recent-empty-state"
@@ -12,9 +13,11 @@ import { StatCards } from "@/components/protected/dashboard/stat-cards"
 import { Button } from "@/components/ui/button"
 import { useDashboard } from "@/hooks/use-dashboard"
 import { authClient } from "@/lib/auth/client"
+import { useConnectAccountStatus } from "@/hooks/use-connect-account-status"
 
 export default function DashboardPage() {
   const { data: session } = authClient.useSession()
+  const { connectAccount } = useConnectAccountStatus()
   const {
     stats,
     revenueChart,
@@ -79,6 +82,10 @@ export default function DashboardPage() {
           </Link>
         </Button>
       </div>
+
+      {connectAccount ? (
+        <ConnectOnboardingBanner account={connectAccount} />
+      ) : null}
 
       {content}
     </>

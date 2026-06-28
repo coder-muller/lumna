@@ -3,6 +3,7 @@
 import { getServerSession } from "@/lib/server/get-server-session"
 import { prisma } from "@/lib/prisma"
 import { InvoiceStatus, Invoices } from "@/lib/generated/prisma/client"
+import { stripe } from "@/lib/stripe"
 import { invoiceIdSchema } from "./invoice-schema"
 
 type CancelInvoiceInput = {
@@ -44,6 +45,27 @@ export async function cancelInvoice(
   if (invoiceExists.status !== InvoiceStatus.OPEN) {
     return {
       error: "Só cobranças abertas podem ser canceladas",
+    }
+  }
+
+  if (invoiceExists.stripeCheckoutSessionId) {
+    try {
+      const checkoutSession = await stripe.checkout.sessions.retrieve(
+        invoiceExists.stripeCheckoutSessionId
+      )
+
+      if (checkoutSession.status === "open") {
+        await stripe.checkout.sessions.expire(
+          invoiceExists.stripeCheckoutSessionId
+        )
+      }
+    } catch (error) {
+      console.error("[invoices/cancel] erro ao expirar Checkout Session", error)
+
+      return {
+        error:
+          "Não foi possível cancelar o link de pagamento na Stripe. Tente novamente.",
+      }
     }
   }
 

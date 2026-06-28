@@ -23,7 +23,8 @@ export type DashboardStats = {
 export type RevenueMonth = {
   key: string
   label: string
-  amount: number
+  grossAmount: number
+  netAmount: number
 }
 
 export type DashboardData = {
@@ -48,7 +49,8 @@ function buildRevenueMonths(): RevenueMonth[] {
     months.push({
       key,
       label: label.charAt(0).toUpperCase() + label.slice(1),
-      amount: 0,
+      grossAmount: 0,
+      netAmount: 0,
     })
   }
 
@@ -82,9 +84,8 @@ export async function getDashboard(): Promise<
 
   const [
     openAggregate,
-    paidAggregate,
     totalCount,
-    receivedThisMonthAggregate,
+    paidInvoicesForStats,
     paidInvoicesForChart,
     recentInvoices,
   ] = await Promise.all([
@@ -98,33 +99,21 @@ export async function getDashboard(): Promise<
       },
     }),
 
-    prisma.invoices.aggregate({
-      where: {
-        userId,
-        status: InvoiceStatus.PAID,
-      },
-      _sum: {
-        value: true,
-      },
-    }),
-
     prisma.invoices.count({
       where: {
         userId,
       },
     }),
 
-    prisma.invoices.aggregate({
+    prisma.invoices.findMany({
       where: {
         userId,
         status: InvoiceStatus.PAID,
-        paidAt: {
-          gte: monthStart,
-          lte: monthEnd,
-        },
       },
-      _sum: {
+      select: {
+        paidAt: true,
         value: true,
+        netReceivedAmount: true,
       },
     }),
 
@@ -141,6 +130,7 @@ export async function getDashboard(): Promise<
       select: {
         paidAt: true,
         value: true,
+        netReceivedAmount: true,
       },
     }),
 
@@ -176,18 +166,42 @@ export async function getDashboard(): Promise<
     const month = amountByKey.get(key)
 
     if (month) {
-      month.amount += invoice.value
+      month.grossAmount += invoice.value
+      month.netAmount += invoice.netReceivedAmount ?? invoice.value
     }
   }
 
+  const nowTime = Date.now()
+  const paidTotal = paidInvoicesForStats.reduce(
+    (total, invoice) => total + (invoice.netReceivedAmount ?? invoice.value),
+    0
+  )
+  const receivedThisMonth = paidInvoicesForStats.reduce((total, invoice) => {
+    if (
+      !invoice.paidAt ||
+      invoice.paidAt < monthStart ||
+      invoice.paidAt > monthEnd
+    ) {
+      return total
+    }
+
+    return total + (invoice.netReceivedAmount ?? invoice.value)
+  }, 0)
+
   return {
     stats: {
-      receivedThisMonth: receivedThisMonthAggregate._sum.value ?? 0,
+      receivedThisMonth,
       openAmount: openAggregate._sum.value ?? 0,
-      paidTotal: paidAggregate._sum.value ?? 0,
+      paidTotal,
       totalCount,
     },
     revenueChart,
-    recentInvoices,
+    recentInvoices: recentInvoices.map((invoice) => ({
+      ...invoice,
+      isStripeCheckoutExpired:
+        invoice.status === InvoiceStatus.OPEN &&
+        Boolean(invoice.stripeCheckoutExpiresAt) &&
+        invoice.stripeCheckoutExpiresAt!.getTime() < nowTime,
+    })),
   }
 }
