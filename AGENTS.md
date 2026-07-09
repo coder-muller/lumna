@@ -11,4 +11,3 @@ Sempre utilize o `bun` para gerenciar o projeto.
 - **Core:** Next.js (App Router) & TypeScript (Modo estrito, evite `any`).
 
 > **Após qualquer implementação**, rode `bun check`.
-
