@@ -11,6 +11,15 @@ export const auth = betterAuth({
     provider: "pg",
     schema,
   }),
+  user: {
+    deleteUser: {
+      enabled: true,
+    },
+  },
+  // OAuth-only MVP: no password to re-verify; email confirmation is the gate.
+  session: {
+    freshAge: 0,
+  },
   socialProviders: {
     github: {
       clientId: process.env.GITHUB_CLIENT_ID as string,

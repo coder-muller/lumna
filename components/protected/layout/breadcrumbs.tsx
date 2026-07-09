@@ -13,6 +13,11 @@ import {
 } from "@/components/ui/breadcrumb"
 import { navItems } from "./nav"
 
+const segmentLabels: Record<string, string> = {
+  account: "Conta",
+  integrations: "Integrações",
+}
+
 export function Breadcrumbs() {
   const pathname = usePathname()
   const segments = pathname.split("/").filter(Boolean)
@@ -36,7 +41,9 @@ export function Breadcrumbs() {
           </BreadcrumbItem>
           <BreadcrumbSeparator className="hidden md:block" />
           <BreadcrumbItem>
-            <BreadcrumbPage>Detalhe</BreadcrumbPage>
+            <BreadcrumbPage>
+              {segmentLabels[segments[1]] ?? "Detalhe"}
+            </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
