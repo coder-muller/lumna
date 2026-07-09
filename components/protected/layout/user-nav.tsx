@@ -9,6 +9,7 @@ import {
   LogOutIcon,
   MonitorIcon,
   MoonIcon,
+  SettingsIcon,
   SunIcon,
 } from "lucide-react"
 
@@ -131,6 +132,16 @@ export function UserNav({ user }: { user: SessionUser }) {
                   ))}
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                className="gap-2"
+                onClick={() => router.push("/settings")}
+              >
+                <SettingsIcon className="size-4" />
+                Configurações
+              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>

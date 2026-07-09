@@ -35,7 +35,7 @@ export default async function SignInPage() {
             Cobranças por link, simples e rápidas.
           </p>
           <p className="text-sm text-background/60">
-            Crie clientes, envie o link e receba via Stripe Checkout.
+            Crie clientes, envie o link e receba via AbacatePay.
           </p>
         </div>
       </aside>
