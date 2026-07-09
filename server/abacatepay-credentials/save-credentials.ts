@@ -14,6 +14,7 @@ import {
   type AbacatepayCredentialsPublic,
   type SaveCredentialsInput,
 } from "./credentials-schema"
+import { registerAbacateWebhook } from "./ensure-webhook"
 
 export async function saveCredentials(
   input: SaveCredentialsInput
@@ -53,7 +54,10 @@ export async function saveCredentials(
 
   const now = new Date()
   const [existing] = await db
-    .select({ id: abacatepayCredentials.id })
+    .select({
+      id: abacatepayCredentials.id,
+      webhookId: abacatepayCredentials.webhookId,
+    })
     .from(abacatepayCredentials)
     .where(eq(abacatepayCredentials.userId, session.user.id))
     .limit(1)
@@ -79,6 +83,13 @@ export async function saveCredentials(
       updatedAt: now,
     })
   }
+
+  // Best-effort: createInvoice will call ensureAbacateWebhook if this fails.
+  await registerAbacateWebhook({
+    userId: session.user.id,
+    apiKey,
+    existingWebhookId: existing?.webhookId,
+  })
 
   return {
     data: {

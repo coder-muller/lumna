@@ -65,7 +65,9 @@ export function AbacatepaySettings() {
       <div className="space-y-1">
         <h2 className="text-lg font-semibold tracking-tight">AbacatePay</h2>
         <p className="text-sm text-muted-foreground">
-          Gerencie a chave de API usada para criar cobranças e clientes.
+          Gerencie a chave de API usada para criar cobranças e clientes. Em
+          HTTPS público, a Lumna registra o webhook automaticamente — você não
+          precisa colar uma URL.
         </p>
       </div>
 

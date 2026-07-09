@@ -1,5 +1,6 @@
 import "server-only"
 
+import { mapAbacatePayError } from "@/lib/abacatepay/errors"
 import { getDecryptedApiKey } from "@/server/abacatepay-credentials/get-decrypted-api-key"
 
 const BASE = "https://api.abacatepay.com/v2"
@@ -17,16 +18,11 @@ export type AbacateApiError = {
 
 export type AbacateFetchResult<T> = { data: T } | AbacateApiError
 
-export async function abacateFetch<T>(
+export async function abacateFetchWithKey<T>(
+  apiKey: string,
   path: string,
   init?: RequestInit
 ): Promise<AbacateFetchResult<T>> {
-  const apiKeyResult = await getDecryptedApiKey()
-
-  if ("error" in apiKeyResult) {
-    return { error: apiKeyResult.error }
-  }
-
   const hasBody = init?.body !== undefined && init?.body !== null
 
   try {
@@ -35,7 +31,7 @@ export async function abacateFetch<T>(
       headers: {
         ...(hasBody ? { "Content-Type": "application/json" } : {}),
         ...init?.headers,
-        Authorization: `Bearer ${apiKeyResult.data}`,
+        Authorization: `Bearer ${apiKey}`,
       },
     })
 
@@ -56,16 +52,19 @@ export async function abacateFetch<T>(
 
     if (!response.ok) {
       return {
-        error:
+        error: mapAbacatePayError(
           envelope.error ??
-          "Não foi possível concluir a operação na AbacatePay.",
+            "Não foi possível concluir a operação na AbacatePay."
+        ),
         status: response.status,
       }
     }
 
     if (envelope.data === undefined) {
       return {
-        error: envelope.error ?? "Resposta inválida da AbacatePay.",
+        error: mapAbacatePayError(
+          envelope.error ?? "Resposta inválida da AbacatePay."
+        ),
       }
     }
 
@@ -76,4 +75,17 @@ export async function abacateFetch<T>(
         "Não foi possível conectar à AbacatePay. Verifique sua conexão e tente novamente.",
     }
   }
+}
+
+export async function abacateFetch<T>(
+  path: string,
+  init?: RequestInit
+): Promise<AbacateFetchResult<T>> {
+  const apiKeyResult = await getDecryptedApiKey()
+
+  if ("error" in apiKeyResult) {
+    return { error: apiKeyResult.error }
+  }
+
+  return abacateFetchWithKey<T>(apiKeyResult.data, path, init)
 }

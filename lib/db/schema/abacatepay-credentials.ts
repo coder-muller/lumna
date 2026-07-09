@@ -12,6 +12,8 @@ export const abacatepayCredentials = pgTable("abacatepay_credentials", {
   encryptedKey: text("encrypted_key").notNull(),
   keyPrefix: text("key_prefix").notNull(),
   keyHint: text("key_hint").notNull(),
+  webhookId: text("webhook_id"),
+  encryptedWebhookSecret: text("encrypted_webhook_secret"),
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at")
     .$onUpdate(() => new Date())

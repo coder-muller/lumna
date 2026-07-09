@@ -1,11 +1,11 @@
 "use server"
 
-import { and, eq } from "drizzle-orm"
+import { and, count, eq } from "drizzle-orm"
 
 import { deleteAbacateCustomer } from "@/lib/abacatepay/customers"
 import { getSession } from "@/lib/auth/session"
 import { db } from "@/lib/db"
-import { customers } from "@/lib/db/schema"
+import { customers, invoices } from "@/lib/db/schema"
 
 import { customerIdSchema } from "./customer-schema"
 
@@ -34,6 +34,19 @@ export async function deleteCustomer(input: {
 
   if (!existing) {
     return { error: "Cliente não encontrado" }
+  }
+
+  const [invoiceCount] = await db
+    .select({ total: count() })
+    .from(invoices)
+    .where(
+      and(eq(invoices.customerId, id), eq(invoices.userId, session.user.id))
+    )
+
+  if ((invoiceCount?.total ?? 0) > 0) {
+    return {
+      error: "Este cliente possui cobranças e não pode ser excluído.",
+    }
   }
 
   const remote = await deleteAbacateCustomer(existing.abacatepayCustomerId)

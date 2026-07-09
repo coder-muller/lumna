@@ -80,7 +80,8 @@ export function ApiKeyForm({
                 <FieldError>{fieldState.error.message}</FieldError>
               ) : (
                 <FieldDescription>
-                  Aceita chaves abc_dev_ ou abc_prod_ com permissão STORE:READ.
+                  A chave precisa permitir clientes, produtos, checkouts e
+                  webhooks. Veja a lista completa no onboarding.
                 </FieldDescription>
               )}
             </Field>
